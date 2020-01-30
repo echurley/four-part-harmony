@@ -6,11 +6,11 @@ chords = ["1"]
 chordNotes = ["135", "246", "357", "461", "572", "613", "724"]
 scale = ["1", "2", "3", "4", "5", "6", "7", "8", "1", "2", "3", "4", "5", "6", "7", "8"]
 beatNotes = ""
-errors = 0
 b = [1]
 s = [17]
 a = []
 t = []
+parallelFifths = ""
 
 #create a random inversion
 def inversionGenerator():
@@ -19,16 +19,10 @@ def inversionGenerator():
 
 #determine if two notes violate parallel fifths
 def parallelFifths(voice1, voice2):
+    parallelFifths = ""
     if (int(voice1[0]) - int(voice2[0])) % 8 == 5:
-        first = "y"
-    else:
-        first = "n"
-    if (int(voice1[1]) - int(voice2[1])) % 8 == 5:
-    	second = "y"
-    else:
-    	second = "n"
-    if first == "y" and second == "y":
-    	parallelFifths = "y"
+        if (int(voice1[1]) - int(voice2[1])) % 8 == 5:
+    		parallelFifths = "y"
     else:
     	parallelFifths = "n"
     return(parallelFifths)
@@ -95,28 +89,26 @@ for beat in range(1, 16):
     if bNote >= 8:
         bNote = bNote - 8
     b.append(int(bNote))
-#b = map(int, b)
-#print(b)
 
 #create soprano line from available notes and rules about notes
 for beat in range(5, 64, 4):
 	notes = list(beatNotes[beat:beat + 3])
 	sNote = int(random.choice(notes)) + 16
 	s.append(sNote)
+	#determine if note breaks any rules
 	while parallelFifths(s[len(s)-2:len(s)],b[len(s)-2:len(s)]) == "y" or parallelFourths(s[len(s)-2:len(s)],b[len(s)-2:len(s)]) == "y" or parallelFourths(s[len(s)-2:len(s)],b[len(s)-2:len(s)]) == "y":
+		#if it does, delete it and try again, removing that note from the available ones
+		notes.remove(str(s[-1] - 16))
 		del s[-1]
 		sNote = random.choice(notes)
 		s.append(sNote)
-		errors = errors + 1
-		print(errors)
-		if errors >= 2:
-			errors = 0
+		#if there are no more available notes, change the chord, rinse and repeat
+		if len(notes) == 0:
 			chords[len(s)] = random.choice(chordList) + inversionGenerator()
 			break
 	#print(s)				
 	#print(s[len(s)-2:len(s)+1],b[len(s)-2:len(s)])
 
-#print(chords)
-#print(beatNotes)
 print(s)
 print(b)
+print(chords)
