@@ -1,13 +1,14 @@
 import random
-from midiutil import MIDIFile
+#from midiutil import MIDIFile
 
 
 
-mf = MIDIFile(4)
-soprano = 0
-alto = 1
-tenor = 2
-bass = 3
+#create midi file with four voices
+#mf = MIDIFile(4)
+#soprano = 0
+#alto = 1
+#tenor = 2
+#bass = 3
 
 
 
@@ -15,7 +16,6 @@ chordList = ["1", "2", "3", "4", "5", "6", "7"]
 inversionList = ["  ", "6 ", "64"]
 chords = ["1"]
 chordNotes = ["135", "246", "357", "461", "572", "613", "724"]
-scale = ["1", "2", "3", "4", "5", "6", "7", "8", "1", "2", "3", "4", "5", "6", "7", "8"]
 beatNotes = ""
 b = [1]
 s = [17]
@@ -95,25 +95,26 @@ chords.append('1  ')
 #determine what notes are available on each beat based on chord
 for beat in range(0, 16):
     chord = chords[beat]
-    degree = chord[0]
-    notes = chordNotes[int(degree)-1]
+    root = chord[0]
+    notes = chordNotes[int(root)-1]
     beatNotes = beatNotes + " " + notes
 
 #create bass line from bass notes in chords
 for beat in range(1, 16):
     chord = chords[beat]
-    degree = int(chord[0])
+    root = int(chord[0])
     inversion = chord[1:3]
     if inversion == "  ":
-        bNote = degree
+        bNote = root
     elif inversion == "6 ":
-        bNote = degree + 2
+        bNote = root + 2
     else:
-        bNote = degree + 4
+        bNote = root + 4
     if bNote >= 8:
         bNote = bNote - 8
     b.append(int(bNote))
 
+print(beatNotes)
 #create soprano line from available notes and rules about notes
 for beat in range(5, 64, 4):
 	notes = list(beatNotes[beat:beat + 3])
@@ -133,6 +134,6 @@ for beat in range(5, 64, 4):
 	#print(s)				
 	#print(s[len(s)-2:len(s)+1],b[len(s)-2:len(s)])
 
-print(s)
-print(b)
-print(chords)
+#print(s)
+#print(b)
+#print(chords)
