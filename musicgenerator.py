@@ -30,6 +30,30 @@ def inversionGenerator():
     inversion = random.choice(inversionList)
     return(inversion)
 
+#determine if two notes violate parallel fourths
+def parallelFourths(voice1, voice2):
+    parallelFourths = ""
+    if (int(voice1[0]) - int(voice2[0])) % 8 == 5:
+        if (int(voice1[1]) - int(voice2[1])) % 8 == 5:
+            parallelFourths = "y"
+        else:
+            parallelFourths = "n"
+    else:
+        parallelFourths = "n"
+    return(parallelFourths)
+    
+#determine if two notes violate parallel octaves
+def parallelFifths(voice1, voice2):
+    parallelOctaves = ""
+    if (int(voice1[0]) - int(voice2[0])) % 8 == 5:
+        if (int(voice1[1]) - int(voice2[1])) % 8 == 5:
+            parallelOctaves = "y"
+        else:
+            parallelOctaves = "n"
+    else:
+        parallelOctaves = "n"
+    return(parallelOctaves)    
+
 #determine if two notes violate parallel fifths
 def parallelFifths(voice1, voice2):
     parallelFifths = ""
@@ -41,38 +65,6 @@ def parallelFifths(voice1, voice2):
     else:
         parallelFifths = "n"
     return(parallelFifths)
-    
-#determine if two notes violate parallel fourths
-def parallelFourths(voice1, voice2):
-    if (int(voice1[0]) - int(voice2[0])) % 8 == 4:
-        first = "y"
-    else:
-        first = "n"
-    if (int(voice1[1]) - int(voice2[1])) % 8 == 4:
-    	second = "y"
-    else:
-    	second = "n"
-    if first == "y" and second == "y":
-    	parallelFourths = "y"
-    else:
-    	parallelFourths = "n"
-    return(parallelFourths)    
-
-#determine if two notes violate parallel octaves
-def parallelOctaves(voice1, voice2):
-    if (int(voice1[0]) - int(voice2[0])) % 8 == 0:
-        first = "y"
-    else:
-        first = "n"
-    if (int(voice1[1]) - int(voice2[1])) % 8 == 0:
-    	second = "y"
-    else:
-    	second = "n"
-    if first == "y" and second == "y":
-    	parallelOctaves = "y"
-    else:
-    	parallelOctaves = "n"
-    return(parallelOctaves)
 
 #need to make sure voice is within the allowable range
 
