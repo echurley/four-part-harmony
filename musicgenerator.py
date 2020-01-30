@@ -1,4 +1,15 @@
 import random
+from midiutil import MIDIFile
+
+
+
+mf = MIDIFile(4)
+soprano = 0
+alto = 1
+tenor = 2
+bass = 3
+
+
 
 chordList = ["1", "2", "3", "4", "5", "6", "7"]
 inversionList = ["  ", "6 ", "64"]
@@ -12,6 +23,8 @@ a = []
 t = []
 parallelFifths = ""
 
+
+
 #create a random inversion
 def inversionGenerator():
     inversion = random.choice(inversionList)
@@ -22,9 +35,11 @@ def parallelFifths(voice1, voice2):
     parallelFifths = ""
     if (int(voice1[0]) - int(voice2[0])) % 8 == 5:
         if (int(voice1[1]) - int(voice2[1])) % 8 == 5:
-    		parallelFifths = "y"
+            parallelFifths = "y"
+        else:
+            parallelFifths = "n"
     else:
-    	parallelFifths = "n"
+        parallelFifths = "n"
     return(parallelFifths)
     
 #determine if two notes violate parallel fourths
@@ -58,6 +73,15 @@ def parallelOctaves(voice1, voice2):
     else:
     	parallelOctaves = "n"
     return(parallelOctaves)
+
+#need to make sure voice is within the allowable range
+
+#need to make sure the voices are close enough together
+
+#need to make sure there is no voice crossing
+
+#make is so the fifth isn't doubled
+
 
 #create random chord progression
 for beat in range(1,14):
