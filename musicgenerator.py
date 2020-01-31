@@ -37,14 +37,17 @@ parallelFifths = ""
 
 #create a random inversion
 def inversionGenerator():
-    inversion = random.choice(inversionList)
+    inversion = random.choice(inversionList)	#chooses a randome inversion from the list
     return(inversion)
 
 #determine if two notes violate parallel fourths
 def parallelFourths(voice1, voice2):
+    voice1 = voice1[len(voice1)-2:len(voice1)]
+    voice2 = voice2[len(voice1)-1:len(voice1)+1]
     parallelFourths = ""
-    if (int(voice1[0]) - int(voice2[0])) % 7 == 5:
-        if (int(voice1[1]) - int(voice2[1])) % 7 == 5:
+    print(voice1, voice2)
+    if (int(voice1[0]) - int(voice2[0])) % 7 == 5:	#if the first two notes are a fifth
+        if (int(voice1[1]) - int(voice2[1])) % 7 == 5:	#if the second two notes are a fifth
             parallelFourths = "y"
         else:
             parallelFourths = "n"
@@ -54,7 +57,8 @@ def parallelFourths(voice1, voice2):
     
 #determine if two notes violate parallel octaves
 def parallelOctaves(voice1, voice2):
-    voice1 = voice1[len(voice1)-2:len(voice1)]
+    voice1 = voice1[len(voice1)-2:len(voice1)]	#only uses the last two notes added
+    voice2 = voice2[len(voice1)-1:len(voice1)+1]
     parallelOctaves = ""
     if (int(voice1[0]) - int(voice2[0])) % 7 == 5:
         if (int(voice1[1]) - int(voice2[1])) % 7 == 5:
@@ -81,7 +85,7 @@ def parallelFifths(voice1, voice2):
     return(parallelFifths)
 
 #make sure voice is within the allowable range
-def rangeFinder(voice):
+def inRange(voice):
     length = len(voice) - 1
     note = int(voice[length])
     if voice[0] == "s":
@@ -104,6 +108,7 @@ def rangeFinder(voice):
             inRange = "y"
         else:
             inRange = "n"
+    return(inRange)
 
 #need to make sure the voices are close enough together
 
@@ -159,7 +164,7 @@ for beat in range(1, 60, 4):
     sNote = int(random.choice(notes)) + 14
     s.append(sNote)
     #determine if note breaks any rules
-    while parallelFifths(s, b) == "y" or parallelFourths(s[len(s)-2:len(s)], b[len(s)-2:len(s)]) == "y" or parallelFourths(s[len(s)-2:len(s)], b[len(s)-2:len(s)]) == "y" or rangeFinder(s):
+    while parallelFifths(s, b) == "y" or parallelFourths(s, b) == "y" or parallelFourths(s, b) == "y" or inRange(s) == "y":
         #if it does, delete it and try again, remove note from available ones
         notes.remove(str(int(s[-1]) - 14))
         del s[-1]
