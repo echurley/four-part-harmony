@@ -7,7 +7,8 @@
 
 
 import random
-from inspect import signature
+#from inspect import signature
+from collections import namedtuple
 #from midiutil import MIDIFile
 
 
@@ -21,31 +22,21 @@ from inspect import signature
 
 
 
-chordList = ["1", "2", "3", "4", "5", "6", "7"]
-inversionList = ["  ", "6 ", "64"]
-chords = ["1  "]
-chordNotes = ["135", "246", "357", "461", "572", "613", "724"]
-beatNotes = ""
-b = ["b", 8]
-s = ["s", 22]
+beatNotes = []
+chords = ['10']
+chordNotes = ["024", "135", "246", "357", "461", "572", "613"]
+b = ["b", 7]
+s = ["s", 21]
 a = ["a"]
 t = ["t"]
-parallelFifths = ""
-#ranges = [15, 26, 12, 22, 8, 19, 3, 15]
 
 
-
-#create a random inversion
-def inversionGenerator():
-    inversion = random.choice(inversionList)	#chooses a randome inversion from the list
-    return(inversion)
 
 #determine if two notes violate parallel fourths
 def parallelFourths(voice1, voice2):
     voice1 = voice1[len(voice1)-2:len(voice1)]
     voice2 = voice2[len(voice1)-1:len(voice1)+1]
     parallelFourths = ""
-    print(voice1, voice2)
     if (int(voice1[0]) - int(voice2[0])) % 7 == 5:	#if the first two notes are a fifth
         if (int(voice1[1]) - int(voice2[1])) % 7 == 5:	#if the second two notes are a fifth
             parallelFourths = "y"
@@ -125,73 +116,100 @@ def inRange(voice):
 
 
 #create random chord progression
-for beat in range(2,16):
-    inversion = inversionGenerator()
-    chord = random.choice(chordList)
+def randChord():
+    inversion = str(random.randrange(0,3))
+    chord = str(random.randrange(0,7))
     chord = chord + inversion
-    chords.append(chord)
-chords.append('5  ')
-chords.append('1  ')
-
+    return(chord)
+    
 #determine what notes are available on each beat based on chord
-for beat in range(1, 17):
-    chord = chords[beat]
-    root = chord[0]
-    notes = chordNotes[int(root)-1]
-    beatNotes = beatNotes + " " + notes
-#print(beatNotes)
+def findNotes(beat):
+    chord = str(chords[beat])
+    root = int(chord[0])
+    notes = chordNotes[root]
+    return(notes)
 
 #create bass line from bass notes in chords
-for beat in range(2, 17):
+def bass(beat):
     chord = chords[beat]
     root = int(chord[0])
-    inversion = chord[1:3]
-    if inversion == "  ":
+    inversion = chord[1]
+    if inversion == "0":
         bNote = root
-    elif inversion == "6 ":
+    elif inversion == "1":
         bNote = root + 2
     else:
         bNote = root + 4
     if bNote >= 8:
         bNote = bNote - 7
     bNote = bNote + 7
-    b.append(int(bNote))
+    return(bNote)
+
+#choose a note for the soprano voice on a specific beat
+def soprano(beat):
+    sNote = int(beatNotes[random.randrange(0,3)]) + 14
+    s.append(sNote)
+    print(sNote)
 
 #create soprano line from available notes and rules about notes
-for beat in range(1, 60, 4):
-    notes = list(beatNotes[beat:beat + 3])
-    #print(notes)
-    sNote = int(random.choice(notes)) + 14
-    s.append(sNote)
+#for beat in range(1, 60, 4):
+ #   notes = list(beatNotes[beat:beat + 3])
+  #  #print(notes)
+   # sNote = int(random.choice(notes)) + 14
+    #s.append(sNote)
     #determine if note breaks any rules
-    while parallelFifths(s, b) == "y" or parallelFourths(s, b) == "y" or parallelFourths(s, b) == "y" or inRange(s) == "y":
+#    while parallelFifths(s, b) == "y" or parallelFourths(s, b) == "y" or parallelFourths(s, b) == "y" or inRange(s) == "y":
         #if it does, delete it and try again, remove note from available ones
-        notes.remove(str(int(s[-1]) - 14))
-        del s[-1]
-        sNote = random.choice(notes)
-        s.append(sNote)
+ #       notes.remove(str(int(s[-1]) - 14))
+  #      del s[-1]
+   #     sNote = random.choice(notes)
+    #    s.append(sNote)
         #if there are no more available notes, change the chord, rinse and repeat
-        if len(notes) == 0:
-            chords[len(s)-1] = random.choice(chordList) + inversionGenerator()
-            chord = chords[len(s)-1]
-            root = int(chord[0])
-            inversion = chord[1:3]
-            if inversion == "  ":
-                bNote = root
-            elif inversion == "6 ":
-                bNote = root + 2
-            else:
-                bNote = root + 4
-            if bNote >= 8:
-                bNote = bNote - 7
-            bNote = bNote + 7
-            b[len(s) - 1] = (int(bNote))
+     #   if len(notes) == 0:
+      #      chords[len(s)-1] = random.choice(chordList) + inversionGenerator()
+       #     chord = chords[len(s)-1]
+        #    root = int(chord[0])
+         #   inversion = chord[1:3]
+          #  if inversion == "  ":
+           #     bNote = root
+            #elif inversion == "6 ":
+#                bNote = root + 2
+ #           else:
+  #              bNote = root + 4
+   #         if bNote >= 8:
+    #            bNote = bNote - 7
+     #       bNote = bNote + 7
+      #      b[len(s) - 1] = (int(bNote))
     #print(s)				
     #print(s[len(s)-2:len(s)+1],b[len(s)-2:len(s)])
 
+
+for beat in range(2,16):
+    chord = randChord()
+    chords.append(chord)
+chords.append('50')
+chords.append('10')
+
+for beat in range(0, 17):
+    notes = findNotes(beat)
+    beatNotes.append(notes)
+    
+for beat in range(1, 17):
+    bNote = bass(beat)
+    b.append(bNote)
+
+for beat in range(1, 17):
+    sNote = soprano(beat)
+    if parallelFourths(s, b) == "y" or parallelFifths(s, b) == "y":
+    	#remove sNote from beatNote[beat]
+    	#try again
+    	#if len(beatNotes[beat]) = 0:
+    	    #change chord, bNote, notes, soprano, rinse and repeat
+    	
+    	
 print(s)
-print(a)
-print(t)
+#print(a)
+#print(t)
 print(b)
-#print(chords)
+print(chords)
 #print(beatNotes)
