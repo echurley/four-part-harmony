@@ -7,7 +7,6 @@
 
 
 import random
-#from inspect import signature
 from collections import namedtuple
 #from midiutil import MIDIFile
 
@@ -22,9 +21,11 @@ from collections import namedtuple
 
 
 
+noteList = ''
 beatNotes = []
+moreNotes = []
 chords = ['10']
-chordNotes = ["024", "135", "246", "357", "461", "572", "613"]
+chordNotes = ["024", "135", "246", "350", "461", "502", "613"]
 b = ["b", 7]
 s = ["s", 21]
 a = ["a"]
@@ -65,7 +66,6 @@ def parallelFifths(voice1, voice2):
     parallelFifths = ""
     voice1a = int(voice1[len(voice1) - 1])
     voice2a = int(voice2[len(voice1) - 1])
-    print(voice1a, voice2a)
     if (int(voice1[1]) - int(voice2[1])) % 7 == 5:
         if (int(voice1[2]) - int(voice2[2])) % 7 == 5:
             parallelFifths = "y"
@@ -79,29 +79,33 @@ def parallelFifths(voice1, voice2):
 def inRange(voice):
     length = len(voice) - 1
     note = int(voice[length])
+    print(note)
     if voice[0] == "s":
-    	if note > 26 or note < 15:
+    	if note > 26 or note < 14:
     	    inRange = "y"
+    	    print("uh oh")
     	else:
     	    inRange = "n"
     elif voice[0] == "a":
-        if note > 22 or note < 12:
+        if note > 22 or note < 11:
             inRange = "y"
         else:
             inRange = "n"
     elif voice[0] == "t":
-        if note > 19 or note < 8:
+        if note > 18 or note < 7:
             inRange = "y"
         else:
             inRange = "n"
     else:
-        if note > 15 or note < 3:
+        if note > 16 or note < 2:
             inRange = "y"
         else:
             inRange = "n"
     return(inRange)
 
 #need to make sure the voices are close enough together
+def spacing(voice1, voice2) #voice1 = upper voice, voice2 = voice right below it
+    if voice1[0] == 's'
 
 #need to make sure there is no voice crossing
 
@@ -146,42 +150,21 @@ def bass(beat):
     return(bNote)
 
 #choose a note for the soprano voice on a specific beat
-def soprano(beat):
-    sNote = int(beatNotes[random.randrange(0,3)]) + 14
-    s.append(sNote)
-    print(sNote)
+def closestNote(voice1, beat):
+    notes = list(map(int, list(beatNotes[beat])))
+    voice1 = int(voice1[beat]) % 7
+    for x in notes:
+        moreNotes.append(x)
+        moreNotes.append(x + 7)
+    closestNote = voice1 + 7
+    for x in moreNotes:
+        if (voice1 - x) < closestNote:
+            closestNote = x
+        else:
+            closestNote = voice1 + 7
+    del moreNotes[:]
+    return(closestNote)
 
-#create soprano line from available notes and rules about notes
-#for beat in range(1, 60, 4):
- #   notes = list(beatNotes[beat:beat + 3])
-  #  #print(notes)
-   # sNote = int(random.choice(notes)) + 14
-    #s.append(sNote)
-    #determine if note breaks any rules
-#    while parallelFifths(s, b) == "y" or parallelFourths(s, b) == "y" or parallelFourths(s, b) == "y" or inRange(s) == "y":
-        #if it does, delete it and try again, remove note from available ones
- #       notes.remove(str(int(s[-1]) - 14))
-  #      del s[-1]
-   #     sNote = random.choice(notes)
-    #    s.append(sNote)
-        #if there are no more available notes, change the chord, rinse and repeat
-     #   if len(notes) == 0:
-      #      chords[len(s)-1] = random.choice(chordList) + inversionGenerator()
-       #     chord = chords[len(s)-1]
-        #    root = int(chord[0])
-         #   inversion = chord[1:3]
-          #  if inversion == "  ":
-           #     bNote = root
-            #elif inversion == "6 ":
-#                bNote = root + 2
- #           else:
-  #              bNote = root + 4
-   #         if bNote >= 8:
-    #            bNote = bNote - 7
-     #       bNote = bNote + 7
-      #      b[len(s) - 1] = (int(bNote))
-    #print(s)				
-    #print(s[len(s)-2:len(s)+1],b[len(s)-2:len(s)])
 
 
 for beat in range(2,16):
@@ -199,17 +182,26 @@ for beat in range(1, 17):
     b.append(bNote)
 
 for beat in range(1, 17):
-    sNote = soprano(beat)
-    if parallelFourths(s, b) == "y" or parallelFifths(s, b) == "y":
-    	#remove sNote from beatNote[beat]
-    	#try again
-    	#if len(beatNotes[beat]) = 0:
-    	    #change chord, bNote, notes, soprano, rinse and repeat
+    sNote = closestNote(s, beat) + 14
+    s.append(sNote)
+    while parallelFourths(s, b) == "y" or parallelFifths(s, b) == "y" or parallelOctaves(s, b) == "y" or inRange(s) == "y":
+        notes = list(beatNotes[beat])
+        notes.remove(str(sNote % 7))
+        for note in notes:
+            noteList = noteList + note
+        beatNotes[beat] = noteList
+        del s[-1]
+        sNote = closestNote(s, beat) + 14
+        s.append(sNote)
+        if len(beatNotes[beat]) == 0:
+            chords[beat] = randChord()
+            b[beat] = bass(beat)
+    beatNotes[beat] = findNotes(beat)
     	
     	
 print(s)
 #print(a)
 #print(t)
 print(b)
-print(chords)
-#print(beatNotes)
+#print(chords)
+print(beatNotes)
