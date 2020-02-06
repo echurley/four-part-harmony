@@ -48,7 +48,7 @@ def parallelFourths(voice1, voice2):
     return(parallelFourths)
     
 #determine if two notes violate parallel octaves
-def parallelOctaves(voice1, voice2):
+def parallelOctaves(voice1, voice2, beat):
     voice1 = voice1[len(voice1)-2:len(voice1)]	#only uses the last two notes added
     voice2 = voice2[len(voice1)-1:len(voice1)+1]
     parallelOctaves = ""
@@ -62,12 +62,12 @@ def parallelOctaves(voice1, voice2):
     return(parallelOctaves)    
 
 #determine if two notes violate parallel fifths
-def parallelFifths(voice1, voice2):
-    parallelFifths = ""
-    voice1a = voice1[-2]
-    voice2a = voice1[len(voice1) - 2]
-    voice1b = voice1[-1]
-    voice2b = voice2[len(voice1) - 1]
+def parallelFifths(voice1, voice2, beat):
+    parallelFifths = "n"
+    voice1a = voice1[beat - 1]
+    voice2a = voice1[beat - 1]
+    voice1b = voice1[beat]
+    voice2b = voice2[beat]
     if (voice1a - voice2a) % 7 == 5:
         if (int(voice1b[-1]) - int(voice2b[2])) % 7 == 5:
             parallelFifths = "y"
@@ -78,8 +78,8 @@ def parallelFifths(voice1, voice2):
     return(parallelFifths)
 
 #make sure voice is within the allowable range
-def inRange(voice):
-    note = int(voice[-1])
+def inRange(voice, beat):
+    note = voice[beat]
     inRange = "n"
     if voice[0] == "s":
     	if note > 26 or note < 14:
@@ -95,20 +95,22 @@ def inRange(voice):
             inRange = "y"
     return(inRange)
 
-def spacing(voice): #voice1 = upper voice, voice2 = voice right below it
+def spacing(voice, beat): #voice1 = upper voice, voice2 = voice right below it
     spacing = "n"
     if voice[0] == 's':
-        if voice[-1] - b[len(s) - 1] > 23:
+        if voice[-1] - b[beat] > 23:
             spacing = "y"
     if voice[0] == 'a':
-        if voice[-1] - t[len(a) - 1] > 7:
+        if voice[-1] - t[beat] > 7:
             spacing = "y"
     if voice[0] == 't':
-        if voice[-1] - b[len(t) - 1] > 9:
+        if voice[-1] - b[beat] > 9:
             spacing = "y"
     return(spacing)
 
-#need to make sure there is no voice crossing
+#voice crossing
+def voiceCrossing(voice1, voice2)
+    if 
 
 #two leaps in a row
 
@@ -186,7 +188,7 @@ for beat in range(1, 17):
 for beat in range(2, 17):
     sNote = closestNote(s, beat) + 14
     s.append(sNote)
-    while parallelFourths(s, b) == "y" or parallelFifths(s, b) == "y" or parallelOctaves(s, b) == "y" or inRange(s) == "y" or spacing(s) == "y":
+    while parallelFourths(s, b, beat) == "y" or parallelFifths(s, b, beat) == "y" or parallelOctaves(s, b, beat) == "y" or inRange(s, beat) == "y" or spacing(s, beat) == "y":
         notes = list(beatNotes[beat])
         notes.remove(str(sNote % 7))
         for note in notes:
