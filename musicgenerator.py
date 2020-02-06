@@ -35,39 +35,34 @@ t = ["t"]
 
 #determine if two notes violate parallel fourths
 def parallelFourths(voice1, voice2, beat):
-    parallelFourths = ""
+    parallelFourths = "n"
     if (voice1[beat - 1] - voice2[beat - 1]) % 7 == 3:
         if (voice1[beat] - voice2[beat]) % 7 == 3:	#if the second two notes are a fifth
             parallelFourths = "y"
-        else:
-            parallelFourths = "n"
-    else:
-        parallelFourths = "n"
+            print("fourths")
     return(parallelFourths)
     
-#determine if two notes violate parallel octaves
+# check for parallel octaves
 def parallelOctaves(voice1, voice2, beat):
-    parallelOctaves = ""
+    parallelOctaves = "n"
     if (voice1[beat - 1] - voice2[beat - 1]) % 7 == 0:
         if (voice1[beat] - voice2[beat]) % 7 == 0:
-            parallelOctaves = "y"
-        else:
-            parallelOctaves = "n"
-    else:
-        parallelOctaves = "n"
+            if voice1[beat - 1] != voice1[beat] and voice2[beat - 1] != voice2[beat]:
+                if voice1[beat - 1] > voice1[beat] and voice2[beat - 1] > voice1[beat] or voice1[beat - 1] < voice1[beat] and voice2[beat - 1] < voice1[beat]:
+                    parallelOctaves = "y"
+                    print("octaves")
     return(parallelOctaves)    
 
+# check for parallel fifths
 def parallelFifths(voice1, voice2, beat):
     parallelFifths = "n"
     if (voice1[beat - 1] - voice2[beat - 1]) % 7 == 4:
         if (voice1[beat] - voice2[beat]) % 7 == 4:
             parallelFifths = "y"
-        else:
-            parallelFifths = "n"
-    else:
-        parallelFifths = "n"
+            print("fifths")
     return(parallelFifths)
 
+# check if the voice is within the correct range
 def inRange(voice, beat):
     note = voice[beat]
     inRange = "n"
@@ -85,19 +80,18 @@ def inRange(voice, beat):
             inRange = "y"
     return(inRange)
 
-def spacing(voice, beat):
+# see if a voice is too far away from another voice
+def spacing(voice1, voice2, beat):
     spacing = "n"
-    if voice[0] == 's':
-        if voice[-1] - b[beat] > 23:
-            spacing = "y"
-    if voice[0] == 'a':
-        if voice[-1] - t[beat] > 7:
-            spacing = "y"
-    if voice[0] == 't':
-        if voice[-1] - b[beat] > 9:
+    if voice1[0] == 't' and voice2[0] == 'b':
+        if (voice1[-1] - voice2[len(voice1) - 1]) > 9:
+            spacing = "y"        
+    else:
+        if (voice1[-1] - voice2[len(voice1) - 1]) > 7:
             spacing = "y"
     return(spacing)
 
+# check for voice crossing
 def voiceCrossing(voice1, voice2):
     crossing = "n"
     voice1a = voice1[beat - 1]
@@ -151,11 +145,12 @@ def bass(beat):
 #choose a note for the soprano voice on a specific beat
 def closestNote(voice1, beat):
     notes = list(map(int, list(beatNotes[beat])))
-    voice1 = (voice1[beat - 1] % 7) + 7
+    voice1 = abs(voice1[beat - 1] % 7) + 7
     for x in notes:
         moreNotes.append(x)
     for x in notes:
         moreNotes.append(x + 7)
+    print(moreNotes)
     closestNote = moreNotes[0]
     for x in moreNotes:
         if (x - voice1) < closestNote:
@@ -184,25 +179,28 @@ for beat in range(1, 17):
 for beat in range(2, 17):
     sNote = closestNote(s, beat) + 14
     s.append(sNote)
-    while parallelFourths(s, b, beat) == "y" or parallelFifths(s, b, beat) == "y" or parallelOctaves(s, b, beat) == "y" or inRange(s, beat) == "y" or spacing(s, beat) == "y":
-        print(beatNotes[beat] + "     " + "error")
+    while parallelFourths(s, b, beat) == "y" or parallelFifths(s, b, beat) == "y" or parallelOctaves(s, b, beat) == "y" or inRange(s, beat) == "y" or spacing(s, b, beat) == "y":
         notes = list(beatNotes[beat])
+        print(notes, sNote % 7)
         notes.remove(str(sNote % 7))
+        noteList = ''
         for note in notes:
             noteList = noteList + note
         beatNotes[beat] = noteList
         del s[-1]
-        sNote = closestNote(s, beat) + 14
-        s.append(sNote)
-        if len(beatNotes[beat]) == 0:
+        if len(beatNotes[beat]) == 1:
             chords[beat] = randChord()
             b[beat] = bass(beat)
+            beatNotes[beat] = findNotes(beat)
+        sNote = closestNote(s, beat) + 14
+        s.append(sNote)
     beatNotes[beat] = findNotes(beat)
+
     	
     	
 print(s)
-#print(a)
-#print(t)
+print(a)
+print(t)
 print(b)
-#print(chords)
+print(chords)
 print(beatNotes)
