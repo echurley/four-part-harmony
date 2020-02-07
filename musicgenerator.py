@@ -251,7 +251,7 @@ def alto():
             aNote = closestNote(a[beat - 1], beat) + 7
             a.append(aNote)
         beatNotes[beat] = findNotes(beat)
-        passFail = "pass"
+    passFail = "pass"
  
 alto()
 while passFail == "fail":
