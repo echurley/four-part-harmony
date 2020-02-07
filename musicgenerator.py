@@ -21,6 +21,7 @@ from collections import namedtuple
 
 
 
+passFail = "pass"
 noteList = ''
 beatNotes = []
 moreNotes = []
@@ -204,38 +205,58 @@ for beat in range(2, 17):
     beatNotes[beat] = findNotes(beat)
     
 #tenor voice
-for beat in range(2, 17):
-    tNote = closestNote(t[beat - 1], beat)
-    t.append(tNote)
-    while parallelFifths(t, b, beat) == "y" or parallelOctaves(t, b, beat) == "y" or inRange("t", t[beat]) == "y" or spacing(t, b, beat) == "y":
-        notes = list(beatNotes[beat])
-        notes.remove(str(tNote % 7))
-        noteList = ''
-        for note in notes:
-            noteList = noteList + note
-        beatNotes[beat] = noteList
-        del t[-1]
+def tenor():
+    global passFail
+    for beat in range(2, 17):
         tNote = closestNote(t[beat - 1], beat)
         t.append(tNote)
-    beatNotes[beat] = findNotes(beat)
+        while parallelFifths(t, b, beat) == "y" or parallelOctaves(t, b, beat) == "y" or inRange("t", t[beat]) == "y" or spacing(t, b, beat) == "y":
+            if len(beatNotes[beat]) == 0:
+               passFail = "fail"
+               return()
+            notes = list(beatNotes[beat])
+            notes.remove(str(tNote % 7))
+            noteList = ''
+            for note in notes:
+                noteList = noteList + note
+            beatNotes[beat] = noteList
+            del t[-1]
+            tNote = closestNote(t[beat - 1], beat)
+            t.append(tNote)
+        beatNotes[beat] = findNotes(beat)
+    passFail = "pass"
+        
+tenor()
+while passFail == "fail":
+    tenor()
 
 #alto voice
-for beat in range(2, 17):
-    aNote = closestNote(a[beat - 1], beat) + 7
-    a.append(aNote)
-    while parallelFifths(a, t, beat) == "y" or parallelOctaves(a, t, beat) == "y" or inRange("a", a[beat]) == "y" or spacing(a, t, beat) == "y":
-        notes = list(beatNotes[beat])
-        print(notes)
-        notes.remove(str(aNote % 7))
-        noteList = ''
-        for note in notes:
-            noteList = noteList + note
-        beatNotes[beat] = noteList
-        del a[-1]
+def alto():
+    global passFail
+    for beat in range(2, 17):
         aNote = closestNote(a[beat - 1], beat) + 7
         a.append(aNote)
-    beatNotes[beat] = findNotes(beat)
- 	
+        while parallelFifths(a, t, beat) == "y" or parallelOctaves(a, t, beat) == "y" or inRange("a", a[beat]) == "y" or spacing(a, t, beat) == "y":
+            if len(beatNotes[beat]) == 0:
+                   passFail = "fail"
+                   return()
+            notes = list(beatNotes[beat])
+            print(notes)
+            notes.remove(str(aNote % 7))
+            noteList = ''
+            for note in notes:
+                noteList = noteList + note
+            beatNotes[beat] = noteList
+            del a[-1]
+            aNote = closestNote(a[beat - 1], beat) + 7
+            a.append(aNote)
+        beatNotes[beat] = findNotes(beat)
+        passFail = "pass"
+ 
+alto()
+while passFail == "fail":
+    alto()
+	
 print(s)
 print(a)
 print(t)
