@@ -42,18 +42,22 @@ def findInterval(voice1, voice2):
 def parallelFourths(voice1, voice2, beat):
     parallelFourths = "n"
     if findInterval(voice1[beat], voice2[beat]) == 3:
-        if findInterval(voice1[beat], voice2[beat]) == 3:	#if the second two notes are a fifth
-            parallelFourths = "y"
+        if findInterval(voice1[beat - 1], voice2[beat - 1]) == 3:
+            if voice1[beat - 1] != voice1[beat]:
+                if (voice1[beat - 1] > voice1[beat] and voice2[beat - 1] > voice2[beat]) or (voice1[beat - 1] < voice1[beat] and voice2[beat - 1] < voice2[beat]):
+                    parallelFourths = "y"
+                    print("fourths error")
     return(parallelFourths)
     
 # check for parallel octaves
 def parallelOctaves(voice1, voice2, beat):
     parallelOctaves = "n"
     if findInterval(voice1[beat], voice2[beat]) == 0:
-        if findInterval(voice1[beat], voice2[beat]) == 0:
-            if voice1[beat - 1] != voice1[beat] and voice2[beat - 1] != voice2[beat]:
+        if findInterval(voice1[beat - 1], voice2[beat - 1]) == 0:
+            if voice1[beat - 1] != voice1[beat]:
                 if (voice1[beat - 1] > voice1[beat] and voice2[beat - 1] > voice2[beat]) or (voice1[beat - 1] < voice1[beat] and voice2[beat - 1] < voice2[beat]):
                     parallelOctaves = "y"
+                    print("octaves error")
     return(parallelOctaves)    
 
 # check for parallel fifths
@@ -61,7 +65,10 @@ def parallelFifths(voice1, voice2, beat):
     parallelFifths = "n"
     if findInterval(voice1[beat], voice2[beat]) == 4:
         if findInterval(voice1[beat - 1], voice2[beat - 1]) == 4:
-            parallelFifths = "y"
+            if voice1[beat - 1] != voice1[beat]:
+                if (voice1[beat - 1] > voice1[beat] and voice2[beat - 1] > voice2[beat]) or (voice1[beat - 1] < voice1[beat] and voice2[beat - 1] < voice2[beat]):
+                    parallelFifths = "y"
+                    print("fifths error")
     return(parallelFifths)
 
 # check if the voice is within the correct range
@@ -145,6 +152,7 @@ def bassNote(beat):
 
 #choose a note for the soprano voice on a specific beat
 def closestNote(voice1, beat):
+    #print(beatNotes, beatNotes[beat], beat)
     notes = list(map(int, list(beatNotes[beat])))
     for x in notes:
         moreNotes.append(x)
@@ -158,8 +166,16 @@ def closestNote(voice1, beat):
     del moreNotes[:]
     return(closestNote)
 
-def bassVoice(beat):    
-    bNote = bassNote(beat)
+def bassVoice(beat):
+    chord = chords[beat]
+    root = int(chord[0])
+    inversion = chord[1]
+    if inversion == "0":
+        bNote = root
+    elif inversion == "1":
+        bNote = root + 2
+    else:
+        bNote = root + 4
     if inRange(b, bNote) == "y":
         bNote = bNote + 7
     if bNote <= 4:
@@ -169,99 +185,121 @@ def bassVoice(beat):
 
 
 #creates chord progression
-for beat in range(2,16):
-    chord = randChord()
-    chords.append(chord)
-chords.append('40')
-chords.append('00')
+def chord():
+    for beat in range(1,14):
+        chord = randChord()
+        chords.append(chord)
+    chords.append('40')
+    chords.append('00')
+    
+chord()
 
 #available notes on each beat
-for beat in range(0, 17):
-    notes = findNotes(beat)
-    beatNotes.append(notes)
+for beat in range(0,16):
+    beatNotes.append(findNotes(beat))
 
-#bass voice    
-for beat in range(2, 17):
-    b.append(bassVoice(beat))
- 
-#soprano voice    
-for beat in range(2, 17):
-    sNote = closestNote(s[beat - 1], beat) + 14
-    s.append(sNote)
-    while parallelFourths(s, b, beat) == "y" or parallelFifths(s, b, beat) == "y" or parallelOctaves(s, b, beat) == "y" or inRange("s", s[beat]) == "y" or spacing(s, b, beat) == "y":
-        notes = list(beatNotes[beat])
-        notes.remove(str(sNote % 7))
-        noteList = ''
-        for note in notes:
-            noteList = noteList + note
-        beatNotes[beat] = noteList
-        del s[-1]
-        if len(beatNotes[beat]) == 0:
-            chords[beat] = randChord()
-            beatNotes[beat] = findNotes(beat)
-            b[beat] = bassVoice(beat)
-        sNote = closestNote(s[beat - 1], beat) + 14
+#bass voice 
+def bass():   
+    for beat in range(1, 16):
+        b.append(bassVoice(beat))
+        
+bass()
+
+#soprano voice 
+def soprano():   
+    for beat in range(0, 16):
+        beatNotes[beat] = findNotes(beat)
+    for beat in range(2, 17):
+        sNote = closestNote(s[beat - 1], beat - 2) + 14
         s.append(sNote)
-    beatNotes[beat] = findNotes(beat)
-    
+        while parallelFourths(s, b, beat) == "y" or parallelFifths(s, b, beat) == "y" or parallelOctaves(s, b, beat) == "y" or inRange("s", s[beat]) == "y" or spacing(s, b, beat) == "y":
+            notes = list(beatNotes[beat - 2])
+            #print(notes, sNote % 7, "sNotes")
+            notes.remove(str(sNote % 7))
+            print(sNote)
+            noteList = ''
+            for note in notes:
+                noteList = noteList + note
+            beatNotes[beat - 2] = noteList
+            del s[-1]
+            if len(beatNotes[beat - 2]) == 0:
+                chords[beat - 3] = randChord()
+                print("chord", chords[beat - 3])
+                beatNotes[beat - 2] = findNotes(beat)
+                print("notes", beatNotes[beat - 2])
+                b[beat - 2] = bassVoice(beat)
+                print("bass", b[beat - 2])
+            sNote = closestNote(s[beat - 1], beat - 2) + 14
+            s.append(sNote)
+
 #tenor voice
 def tenor():
-    global passFail
+    for beat in range(0, 16):
+        beatNotes[beat] = findNotes(beat)
     for beat in range(2, 17):
-        tNote = closestNote(t[beat - 1], beat)
+        tNote = closestNote(t[beat - 1], beat - 2)
         t.append(tNote)
         while parallelFifths(t, b, beat) == "y" or parallelOctaves(t, b, beat) == "y" or inRange("t", t[beat]) == "y" or spacing(t, b, beat) == "y":
-            if len(beatNotes[beat]) == 0:
-               passFail = "fail"
-               return()
-            notes = list(beatNotes[beat])
+            notes = list(beatNotes[beat - 2])
+            print(notes, tNote % 7, "tnotes")
             notes.remove(str(tNote % 7))
             noteList = ''
             for note in notes:
                 noteList = noteList + note
-            beatNotes[beat] = noteList
+            beatNotes[beat - 2] = noteList
+            if len(beatNotes[beat - 2]) == 0:
+               print("t fail")
+               return("fail")
             del t[-1]
-            tNote = closestNote(t[beat - 1], beat)
-            t.append(tNote)
-        beatNotes[beat] = findNotes(beat)
-    passFail = "pass"
-        
-tenor()
-while passFail == "fail":
-    tenor()
+            tNote = closestNote(t[beat - 1], beat - 2)
+            t.append(tNote)            
 
 #alto voice
 def alto():
-    global passFail
-    for beat in range(2, 17):
-        aNote = closestNote(a[beat - 1], beat) + 7
+    for beat in range(0, 16):
+        beatNotes[beat] = findNotes(beat)
+    for beat in range(2, 16):
+        aNote = closestNote(a[beat - 1], beat - 2) + 7
         a.append(aNote)
         while parallelFifths(a, t, beat) == "y" or parallelOctaves(a, t, beat) == "y" or inRange("a", a[beat]) == "y" or spacing(a, t, beat) == "y":
-            if len(beatNotes[beat]) == 0:
-                   passFail = "fail"
-                   return()
-            notes = list(beatNotes[beat])
-            print(notes)
+            notes = list(beatNotes[beat - 2])
+            print(notes, aNote % 7, "aNotes")
             notes.remove(str(aNote % 7))
             noteList = ''
             for note in notes:
                 noteList = noteList + note
-            beatNotes[beat] = noteList
+            beatNotes[beat - 2] = noteList
+            if len(beatNotes[beat - 2]) == 0:
+               print("a fail")
+               return("fail")
             del a[-1]
-            aNote = closestNote(a[beat - 1], beat) + 7
+            aNote = closestNote(a[beat - 1], beat - 2)
             a.append(aNote)
-        beatNotes[beat] = findNotes(beat)
-    passFail = "pass"
- 
-alto()
-while passFail == "fail":
-    alto()
-	
-print(s)
-print(a)
-print(t)
-print(b)
-print(chords)
+            
+             
+           
+soprano()
+
+while tenor() == "fail":
+    s = s[:-15]
+    del t[2:-1]
+    t = ['t', 11]
+    b = b[:-15]
+    chords = chords[:-14]
+    chord()
+    bass()
+    soprano()
+            
+#while alto() == "fail":
+#    s = s[:2]
+#    a = a[:2]
+#    t = t[:2]
+#    b = b[:2]
+#    chords = chords[:1]
+#    chord()
+#    bass()
+#    soprano()
+#    tenor()
 
 
 #        if parallelFourths(s, b, beat) == "y":
@@ -322,6 +360,7 @@ turtle.forward(980)
 turtle.right(90)
 turtle.forward(-40)
 def upperTurtleNote(voice, beat):
+    print(voice[0], voice[beat] % 7)
     turtle.forward(30)
     turtle.forward(10 * voice[beat])
     turtle.stamp()
@@ -350,6 +389,7 @@ def upperTurtleNote(voice, beat):
     turtle.forward(-10 * voice[beat])
     turtle.forward(-30)
 def lowerTurtleNote(voice, beat):
+    print(voice[0], voice[beat] % 7)
     turtle.forward(10 * voice[beat])
     turtle.stamp()
     turtle.right(90)
@@ -375,14 +415,30 @@ def lowerTurtleNote(voice, beat):
         turtle.forward(10)
     turtle.right(-90)
     turtle.forward(-10 * voice[beat])
+def turtleChord(beat):
+    chord = chords[beat]
+    root = int(chord[0])
+    inversion = chord[1]
+    if inversion == "0":
+        number = ""
+    elif inversion == "1":
+        number = "6"
+    else:
+        number = "64"
+    turtle.write(str(root + 1) + " " + number, font = ('Times New Roman', 18, 'bold'))
+    
 for beat in range(1, 17):
+    print("beat: " + str(beat))
+    print(beatNotes[beat - 1])
+    turtleChord(beat - 1)
     upperTurtleNote(s, beat)
-    upperTurtleNote(a, beat)
+#    upperTurtleNote(a, beat)
     lowerTurtleNote(t, beat)
     lowerTurtleNote(b, beat)
     turtle.right(90)
     turtle.forward(50)
     turtle.right(-90)
+time.sleep(5)
 turtle.forward(10000)
 
 turtle.mainloop()
