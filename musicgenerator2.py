@@ -139,7 +139,6 @@ def soprano(beat):
     while parallelFourths(s, b, beat) == "no" or parallelFifths(s, b, beat) == "no" or parallelOctaves(s, b, beat) == "no" or spacing(s, b, beat) == "no" or inRange(s, beat) == "no":
         notes.remove(s.notes[-1])
         if len(notes) == 0:
-            del s.notes[-1]
             return('no')
         beatNotes[beat] = notes
         del s.notes[-1]
@@ -154,7 +153,6 @@ def tenor(beat):
     while parallelFifths(t, b, beat) == "no" or parallelFifths(s, t, beat) == "no" or parallelOctaves(t, b, beat) == "no" or parallelOctaves(s, t, beat) == "no" or spacing(t, b, beat) == "no" or inRange(t, beat) == "no":
         notes.remove(t.notes[-1])
         if len(notes) == 0:
-            del t.notes[-1]
             return('no')
         beatNotes[beat] = notes
         del t.notes[-1]
@@ -169,7 +167,6 @@ def alto(beat):
     while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no":    
         notes.remove(a.notes[-1])
         if len(notes) == 0:
-            del a.notes[-1]
             return('no')
         beatNotes[beat] = notes
         del a.notes[-1]
@@ -193,6 +190,9 @@ for beat in range(1, 16):
         chords.chords[beat] = randChord()
         beatNotes[beat] = findNotes(beat)
         b.notes[beat] = bass(beat)
+        del s.notes[beat]
+        del a.notes[beat]
+        del t.notes[beat]
         print("RESET -----------------------", beat, s, b)
 
 
