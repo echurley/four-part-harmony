@@ -178,9 +178,7 @@ def alto(beat):
 
 for beat in range(1, 13):
     chords.chords.append(randChord())
-chords.chords.append('40')
-chords.chords.append('00')
-chords.chords.append('00')
+chords.chords.extend(('40', '00'))
 
 for beat in range(1, 16):
     print("BEAT ", beat)
