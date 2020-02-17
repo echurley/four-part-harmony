@@ -180,7 +180,7 @@ for beat in range(1, 13):
     chords.chords.append(randChord())
 chords.chords.extend(('40', '00'))
 
-for beat in range(1, 16):
+for beat in range(1, 15):
     print("BEAT ", beat)
     beatNotes.append(findNotes(beat))
     b.notes.append(bass(beat))
@@ -196,7 +196,7 @@ for beat in range(1, 16):
 
 
 turtle.shape("circle")
-turtle.speed(10.5)
+turtle.speed(0)
 turtle.penup()
 turtle.forward(-400)
 turtle.right(-90)
@@ -305,7 +305,7 @@ def turtleChord(beat):
         number = "64"
     turtle.write(str(root + 1) + " " + number, font = ('Times New Roman', 18, 'bold'))
     
-for beat in range(0, 16):
+for beat in range(0, 15):
     turtleChord(beat)
     upperTurtleNote(s, beat)
     upperTurtleNote(a, beat)
