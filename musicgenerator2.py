@@ -37,9 +37,9 @@ def parallelOctaves(voice1, voice2, beat):
     parallelOctaves = "go"
     if voice1.notes[beat] - voice2.notes[beat] == 7:
         if voice1.notes[beat - 1] - voice2.notes[beat - 1] == 7:
-            if voice1.notes[beat - 1] != voice1.notes[beat] and voice2.notes[beat - 1] != voice2.notes[beat]:
-                if (voice1.notes[beat - 1] > voice1.notes[beat] and voice2.notes[beat - 1] > voice2.notes[beat]) or (voice1.notes[beat - 1] < voice1.notes[beat] and voice2.notes[beat - 1] < voice2.notes[beat]):
-                    parallelOctaves = "no"
+            #if voice1.notes[beat - 1] != voice1.notes[beat] and voice2.notes[beat - 1] != voice2.notes[beat]:
+               # if (voice1.notes[beat - 1] > voice1.notes[beat] and voice2.notes[beat - 1] > voice2.notes[beat]) or (voice1.notes[beat - 1] < voice1.notes[beat] and voice2.notes[beat - 1] < voice2.notes[beat]):
+            parallelOctaves = "no"
     return(parallelOctaves)
     
 def inRange(voice, beat):
@@ -72,10 +72,11 @@ def spacing(voice1, voice2, beat): #voice1 is above voice2 btw
             spacing = "no"
     return(spacing)
     
-def leapFinder(voice, beat):
+def twoLeaps(voice, beat):
     leap = "go"
-    if abs(voice.notes[beat - 1] - voice.notes[beat]) > 3:
-        leap = "no"
+    if abs(voice.notes[beat - 2] - voice.notes[beat - 1]) > 3:
+        if abs(voice.notes[beat - 1] - voice.notes[beat]) > 3:
+            leap = "no"
     return(leap)
     
 def voiceCrossing(voice1, voice2, beat):
@@ -127,9 +128,14 @@ def bass(beat):
 def closestNote(voice, beat, notes):
     closestNote = notes[0]
     voice = voice.notes[beat - 1]
-    for x in notes:
-        if abs(voice - x) < abs(voice - closestNote):
-            closestNote = x
+    if beat < 8:
+        for x in notes:
+            if abs(voice - x) <= abs(voice - closestNote):
+                closestNote = x   
+    else:
+        for x in notes:
+            if abs(voice - x) < abs(voice - closestNote):
+                closestNote = x  
     return(closestNote)
     
 def soprano(beat):
@@ -144,7 +150,6 @@ def soprano(beat):
         del s.notes[-1]
         soprano = closestNote(s, beat, notes)
         s.notes.append(soprano)
-        print('soprano')
 
 def tenor(beat):
     notes = findMoreNotes(t, beat)
@@ -158,21 +163,29 @@ def tenor(beat):
         del t.notes[-1]
         tenor = closestNote(t, beat, notes)
         t.notes.append(tenor)
-        print('tenor')
         
 def alto(beat):
     notes = findMoreNotes(a, beat)
     alto = closestNote(a, beat, notes)
     a.notes.append(alto)
-    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no":    
-        notes.remove(a.notes[-1])
-        if len(notes) == 0:
-            return('no')
-        beatNotes[beat] = notes
-        del a.notes[-1]
-        alto = closestNote(a, beat, notes)
-        a.notes.append(alto)
-        print('alto')
+    if beat == 1:
+        while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no":    
+            notes.remove(a.notes[-1])
+            if len(notes) == 0:
+                return('no')
+            beatNotes[beat] = notes
+            del a.notes[-1]
+            alto = closestNote(a, beat, notes)
+            a.notes.append(alto)
+    else:
+        while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or twoLeaps(a, beat) == "no":    
+            notes.remove(a.notes[-1])
+            if len(notes) == 0:
+                return('no')
+            beatNotes[beat] = notes
+            del a.notes[-1]
+            alto = closestNote(a, beat, notes)
+            a.notes.append(alto)
 
 
 
@@ -181,7 +194,6 @@ for beat in range(1, 13):
 chords.chords.extend(('40', '00'))
 
 for beat in range(1, 15):
-    print("BEAT ", beat)
     beatNotes.append(findNotes(beat))
     b.notes.append(bass(beat))
     while soprano(beat) == 'no' or tenor(beat) == 'no' or alto(beat) == 'no':
@@ -191,7 +203,6 @@ for beat in range(1, 15):
         del s.notes[beat]
         del a.notes[beat]
         del t.notes[beat]
-        print("RESET -----------------------", beat, s, b)
 
 
 
@@ -323,3 +334,5 @@ print(b.notes)
 print(chords.chords)
 
 turtle.mainloop()
+
+
