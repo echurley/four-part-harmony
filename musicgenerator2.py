@@ -1,6 +1,7 @@
 from collections import namedtuple
 import random
 import turtle
+from midiutil import MIDIFile
 
 chordNotes = ["024", "135", "246", "350", "461", "502", "613"]
 
@@ -206,133 +207,80 @@ for beat in range(1, 15):
 
 
 
-turtle.shape("circle")
-turtle.speed(0)
-turtle.penup()
-turtle.forward(-400)
-turtle.right(-90)
-turtle.forward(100)
-turtle.right(90)
-turtle.pendown()
-for x in range(5):
-    turtle.forward(800)
-    turtle.penup()
-    turtle.right(90)
-    turtle.forward(20)
-    turtle.right(-90)
-    turtle.forward(-800)
-    turtle.pendown()
-turtle.penup()
-turtle.right(90)
-turtle.forward(50)
-turtle.right(-90)
-turtle.pendown()
-for x in range(5):
-    turtle.forward(800)
-    turtle.penup()
-    turtle.right(90)
-    turtle.forward(20)
-    turtle.right(-90)
-    turtle.forward(-800)
-    turtle.pendown()
-turtle.penup()
-turtle.right(-90)
-turtle.forward(20)
-for x in range(5):
-    turtle.pendown()
-    turtle.forward(230)
-    turtle.penup()
-    turtle.forward(-230)
-    turtle.right(90)
-    turtle.forward(200)
-    turtle.right(-90)
-turtle.right(-90)
-turtle.forward(980)
-turtle.right(90)
-turtle.forward(-40)
-def upperTurtleNote(voice, beat):
-    turtle.forward(30)
-    turtle.forward(10 * voice.notes[beat])
-    turtle.stamp()
-    turtle.right(90)
-    if voice == s or voice == t:
-        turtle.forward(10)
-    else:
-        turtle.forward(-10)
-    turtle.right(-90)
-    if voice == s or voice == t:
-        turtle.forward(40)
-    else:
-        turtle.forward(-40)
-    turtle.pendown()
-    if voice == s or voice == t:
-        turtle.forward(-40)
-    else:
-        turtle.forward(40)
-    turtle.penup()
-    turtle.right(90)
-    if voice == s or voice == t:
-        turtle.forward(-10)
-    else:
-        turtle.forward(10)
-    turtle.right(-90)
-    turtle.forward(-10 * voice.notes[beat])
-    turtle.forward(-30)
-def lowerTurtleNote(voice, beat):
-    turtle.forward(10 * voice.notes[beat])
-    turtle.stamp()
-    turtle.right(90)
-    if voice == s or voice == t:
-        turtle.forward(10)
-    else:
-        turtle.forward(-10)
-    turtle.right(-90)
-    if voice == s or voice == t:
-        turtle.forward(40)
-    else:
-        turtle.forward(-40)
-    turtle.pendown()
-    if voice == s or voice == t:
-        turtle.forward(-40)
-    else:
-        turtle.forward(40)
-    turtle.penup()
-    turtle.right(90)
-    if voice == s or voice == t:
-        turtle.forward(-10)
-    else:
-        turtle.forward(10)
-    turtle.right(-90)
-    turtle.forward(-10 * voice.notes[beat])
-def turtleChord(beat):
-    chord = chords.chords[beat]
-    root = int(chord[0])
-    inversion = chord[1]
-    if inversion == "0":
-        number = ""
-    elif inversion == "1":
-        number = "6"
-    else:
-        number = "64"
-    turtle.write(str(root + 1) + " " + number, font = ('Times New Roman', 18, 'bold'))
-    
-for beat in range(0, 15):
-    turtleChord(beat)
-    upperTurtleNote(s, beat)
-    upperTurtleNote(a, beat)
-    lowerTurtleNote(t, beat)
-    lowerTurtleNote(b, beat)
-    turtle.right(90)
-    turtle.forward(50)
-    turtle.right(-90)
-turtle.forward(10000)
-
-print(s.notes)
-print(a.notes)
-print(t.notes)
-print(b.notes)
-print(chords.chords)
-
-turtle.mainloop()
+def translator(RANDOMLIST):
+    newList = []
+    for x in RANDOMLIST:
+        noteFinder = x % 7
+        if noteFinder == 0:
+            degree = 0  # c
+        elif noteFinder == 1:
+            degree = 2  # d
+        elif noteFinder == 2:
+            degree = 4  # e
+        elif noteFinder == 3:
+            degree = 5  # f
+        elif noteFinder == 4:
+            degree = 7  # g
+        elif noteFinder == 5:
+            degree = 9  # a
+        else:
+            degree = 11  # b
+        scraped = int(x) - int(x % 7)
+        octave = (scraped / 7)
+        newNote = 12 + 12 +12 + (octave * 12) + degree  # c0 plus extra octave plus octave generated plus degree
+        newNote = int(newNote)
+        newList = newList + [newNote]
+    return(newList)
 
 
+sList = translator(s.notes)
+aList = translator(a.notes)
+tList = translator(t.notes)
+bList = translator(b.notes)
+
+# 21 = C5
+# 16 = E4
+# 11 = G3
+# 7 = C3
+# find note, then octave
+
+bVerify = "no"
+sVerify = "no"
+aVerify = "no"
+tVerify = "no"
+
+time = 0
+duration = 1
+channel = 0
+tempo = 100
+volume = 100
+MyMIDI = MIDIFile(4)
+MyMIDI.addTempo(1, time, tempo)
+
+for pitch in bList:
+    if time != 0 and bVerify == "no":
+        time = 0
+    MyMIDI.addNote(3, channel, pitch, time, duration, volume)
+    time = time + 1
+    bVerify = "go"
+for pitch in sList:
+    if time != 0 and sVerify == "no":
+        time = 0
+    MyMIDI.addNote(0, channel, pitch, time, duration, volume)
+    time = time + 1
+    sVerify = "go"
+for pitch in aList:
+    if time != 0 and aVerify == "no":
+        time = 0
+    MyMIDI.addNote(1, channel, pitch, time, duration, volume)
+    time = time + 1
+    aVerify = "go"
+for pitch in tList:
+    if time != 0 and tVerify == "no":
+        time = 0
+    MyMIDI.addNote(2, channel, pitch, time, duration, volume)
+    time = time + 1
+    tVerify = "go"
+
+with open("test1.mid", "wb") as output_file:
+    MyMIDI.writeFile(output_file)
