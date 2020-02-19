@@ -4,6 +4,7 @@ import turtle
 from midiutil import MIDIFile
 
 chordNotes = ["024", "135", "246", "350", "461", "502", "613"]
+cadences = ['AC', 'HC', 'P', 'D']
 
 voice = namedtuple('voice', 'part notes')
 s = voice('s', [21])
@@ -91,10 +92,21 @@ def voiceCrossing(voice1, voice2, beat):
     return(crossing)
 
 def randChord():
-    inversion = str(random.randrange(0,3))
-    chord = str(random.randrange(0,7))
+    inversion = str(random.randrange(3))
+    chord = str(random.randrange(7))
     chord = chord + inversion
     return(chord)
+    
+def cadence():
+    cadence = cadences[random.randrange(3)]
+    if cadence == 'AC':
+        chords.chords.extend(('4' + str(random.randrange(2)), '0' + str(random.randrange(2))))
+    elif cadence == 'HC':
+        chords.chords.extend((randChord(), '4' + str(random.randrange(2))))
+    elif cadence == 'P':
+        chords.chords.extend(('3' + str(random.randrange(2)), '0' + str(random.randrange(2))))
+    else:
+        chords.chords.extend(('4' + str(random.randrange(2)), '3' + str(random.randrange(2))))
 
 def findNotes(beat):
     chord = chords.chords[beat]
@@ -192,18 +204,21 @@ def alto(beat):
 
 for beat in range(1, 13):
     chords.chords.append(randChord())
-chords.chords.extend(('40', '00'))
+cadence()
 
 for beat in range(1, 15):
     beatNotes.append(findNotes(beat))
     b.notes.append(bass(beat))
     while soprano(beat) == 'no' or tenor(beat) == 'no' or alto(beat) == 'no':
-        chords.chords[beat] = randChord()
-        beatNotes[beat] = findNotes(beat)
-        b.notes[beat] = bass(beat)
+        if beat < 13:
+            chords.chords[beat] = randChord()
+            beatNotes[beat] = findNotes(beat)
+            b.notes[beat] = bass(beat)
+            print('not cadence')
         del s.notes[beat]
         del a.notes[beat]
         del t.notes[beat]
+    print(beat)
 
 
 
