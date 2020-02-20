@@ -204,20 +204,22 @@ for beat in range(1, 13):
 cadence()
 
 for beat in range(1, 15):
+    counter = 1
     beatNotes.append(findNotes(beat))
     b.notes.append(bass(beat))
-    while soprano(beat) == 'no' or tenor(beat) == 'no' or alto(beat) == 'no':
+    while soprano(beat) == 'no' or tenor(beat) == 'no' or alto(beat) == 'no' and counter < 1000:
+        counter += 1
         if beat < 13:
             chords.chords[beat] = randChord()
             b.notes[beat] = bass(beat)
         beatNotes[beat] = findNotes(beat)
         if voiceError == 's':
-            print(s)
+            print(s, counter)
         elif voiceError == 't':
-            print(t)
+            print(t, counter)
             del s.notes[beat]
         elif voiceError == 'a':
-            print(a)
+            print(a, counter)
             del s.notes[beat]
             del t.notes[beat]
         voiceError = ''
