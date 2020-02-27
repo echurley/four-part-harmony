@@ -244,7 +244,7 @@ def fourBars(number):
     chords.chords.append(chords.chords[-1])
 
 while fourBars(0) == 'no':
-    print('retry -----------------')
+    #print('retry -----------------')
     del s.notes[1:]
     del a.notes[1:]
     del t.notes[1:]
@@ -253,7 +253,6 @@ while fourBars(0) == 'no':
 
 number = 0
 while chords.chords[-1][0] == '4':
-    print(chords.chords[-1], 'half')
     s.notes.append(21)
     a.notes.append(16)
     t.notes.append(11)
@@ -270,18 +269,15 @@ while chords.chords[-1][0] == '4':
         del b.notes[(16 * number) + 1:]
         del chords.chords[(16 * number) + 1:]
         if count > 100:
-            number = 0
-            del s.notes[1:]
-            del a.notes[1:]
-            del t.notes[1:]
-            del b.notes[1:]
-            del chords.chords[1:]
-    
-print(s)
-print(a)
-print(t)
-print(b)
-print(chords)
+            del s.notes[(16 * (number - 1)) + 1:]
+            del a.notes[(16 * (number - 1)) + 1:]
+            del t.notes[(16 * (number - 1)) + 1:]
+            del b.notes[(16 * (number - 1)) + 1:]
+            del chords.chords[(16 * (number - 1)) + 1:]
+            number = number - 1
+    print(number)
+
+
 
 def translator(RANDOMLIST):
     newList = []
@@ -330,13 +326,13 @@ duration = 1
 channel = 0
 tempo = 100
 volume = 100
-MyMIDI = MIDIFile(4)
+MyMIDI = MIDIFile(2)
 MyMIDI.addTempo(1, time, tempo)
 
 for pitch in bList:
     if time != 0 and bVerify == "no":
         time = 0
-    MyMIDI.addNote(3, channel, pitch, time, duration, volume)
+    MyMIDI.addNote(1, channel, pitch, time, duration, volume)
     time = time + 1
     bVerify = "go"
 for pitch in sList:
@@ -348,13 +344,13 @@ for pitch in sList:
 for pitch in aList:
     if time != 0 and aVerify == "no":
         time = 0
-    MyMIDI.addNote(1, channel, pitch, time, duration, volume)
+    MyMIDI.addNote(0, channel, pitch, time, duration, volume)
     time = time + 1
     aVerify = "go"
 for pitch in tList:
     if time != 0 and tVerify == "no":
         time = 0
-    MyMIDI.addNote(2, channel, pitch, time, duration, volume)
+    MyMIDI.addNote(1, channel, pitch, time, duration, volume)
     time = time + 1
     tVerify = "go"
 
