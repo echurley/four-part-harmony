@@ -237,11 +237,11 @@ def fourBars(number):
                 break
         if counter >= 200:
             return('no')
-        s.notes.append(s.notes[-1])
-        a.notes.append(a.notes[-1])
-        t.notes.append(t.notes[-1])
-        b.notes.append(b.notes[-1])
-        chords.chords.append(chords.chords[-1])
+    s.notes.append(s.notes[-1])
+    a.notes.append(a.notes[-1])
+    t.notes.append(t.notes[-1])
+    b.notes.append(b.notes[-1])
+    chords.chords.append(chords.chords[-1])
 
 while fourBars(0) == 'no':
     print('retry -----------------')
@@ -258,15 +258,24 @@ while chords.chords[-1][0] == '4':
     a.notes.append(16)
     t.notes.append(11)
     b.notes.append(7)
-    chords.chords.append('1' + str(random.randrange(0, 3)))
+    chords.chords.append('00')
     number += 1
+    count = 0
     while fourBars(number) == 'no':
-        print('retry -----------------', number)
+        #print('retry -----------------', number, count)
+        count += 1
         del s.notes[(16 * number) + 1:]
         del a.notes[(16 * number) + 1:]
         del t.notes[(16 * number) + 1:]
         del b.notes[(16 * number) + 1:]
         del chords.chords[(16 * number) + 1:]
+        if count > 100:
+            number = 0
+            del s.notes[1:]
+            del a.notes[1:]
+            del t.notes[1:]
+            del b.notes[1:]
+            del chords.chords[1:]
     
 print(s)
 print(a)
