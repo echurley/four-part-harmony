@@ -211,25 +211,23 @@ def alto(beat):
 
 
 
-def fourBars():
+def fourBars(number):
     global voiceError
-    for beat in range(1, 13):
+    for beat in range(number + 1, (number + 1) * 16 - 3):
         chords.chords.append(randChord())
     cadence()
     
-    for beat in range(1, 15):
+    for beat in range(number + 1, (number + 1) * 16 - 1):
         counter = 0
         beatNotes.append(findNotes(beat))
         b.notes.append(bass(beat))
         voiceError = ''
         while soprano(beat) == 'no' or tenor(beat) == 'no' or alto(beat) == 'no' and counter < 200:
-            print(voiceError)
             counter += 1
             if beat < 13:
                 chords.chords[beat] = randChord()
                 b.notes[beat] = bass(beat)
             beatNotes[beat] = findNotes(beat)
-            print(beatNotes)
             if voiceError == 't':
                 del s.notes[beat]
             elif voiceError == 'a':
@@ -239,16 +237,42 @@ def fourBars():
                 break
         if counter >= 200:
             return('no')
+        s.notes.append(s.notes[-1])
+        a.notes.append(a.notes[-1])
+        t.notes.append(t.notes[-1])
+        b.notes.append(b.notes[-1])
+        chords.chords.append(chords.chords[-1])
 
-while fourBars() == 'no':
+while fourBars(0) == 'no':
     print('retry -----------------')
     del s.notes[1:]
     del a.notes[1:]
     del t.notes[1:]
     del b.notes[1:]
     del chords.chords[1:]
-    
 
+number = 0
+while chords.chords[-1][0] == '4':
+    print(chords.chords[-1], 'half')
+    s.notes.append(21)
+    a.notes.append(16)
+    t.notes.append(11)
+    b.notes.append(7)
+    chords.chords.append('1' + str(random.randrange(0, 3)))
+    number += 1
+    while fourBars(number) == 'no':
+        print('retry -----------------', number)
+        del s.notes[(16 * number) + 1:]
+        del a.notes[(16 * number) + 1:]
+        del t.notes[(16 * number) + 1:]
+        del b.notes[(16 * number) + 1:]
+        del chords.chords[(16 * number) + 1:]
+    
+print(s)
+print(a)
+print(t)
+print(b)
+print(chords)
 
 def translator(RANDOMLIST):
     newList = []
