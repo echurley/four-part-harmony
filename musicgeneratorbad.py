@@ -85,7 +85,7 @@ def voiceCrossing(voice1, voice2, beat):
     crossing = "go"
     if voice1.notes[beat] < voice2.notes[beat - 1]:
         crossing = "no"
-    if voice2.notes[beat] < voice1.notes[beat - 1]:
+    if voice2.notes[beat] > voice1.notes[beat - 1]:
         crossing = "no"
     if voice1.notes[beat] < voice2.notes[beat]:
         crossing = "no"
@@ -176,7 +176,7 @@ def tenor(beat):
     notes = findMoreNotes(t, beat)
     tNote = closestNote(t, beat, notes)
     t.notes.append(tNote)
-    while parallelFifths(t, b, beat) == "no" or parallelFifths(s, t, beat) == "no" or parallelOctaves(t, b, beat) == "no" or parallelOctaves(s, t, beat) == "no" or spacing(t, b, beat) == "no" or inRange(t, beat) == "no":
+    while parallelFifths(t, b, beat) == "no" or parallelFifths(s, t, beat) == "no" or parallelOctaves(t, b, beat) == "no" or parallelOctaves(s, t, beat) == "no" or spacing(t, b, beat) == "no" or inRange(t, beat) == "no" or voiceCrossing(t, b, beat) == 'no':
         notes.remove(t.notes[-1])
         del t.notes[-1]
         if len(notes) == 0:
@@ -195,7 +195,7 @@ def alto(beat):
     notes = findMoreNotes(a, beat)
     alto = closestNote(a, beat, notes)
     a.notes.append(alto)
-    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no":    
+    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t, beat) == 'no':    
         notes.remove(a.notes[-1])
         del a.notes[-1]
         if len(notes) == 0:
@@ -233,9 +233,9 @@ def fourBars(number):
             elif voiceError == 'a':
                 del s.notes[beat]
                 del t.notes[beat]
-            if counter > 200:
+            if counter > 100:
                 break
-        if counter >= 200:
+        if counter >= 100:
             return('no')
     s.notes.append(s.notes[-1])
     a.notes.append(a.notes[-1])
@@ -244,39 +244,37 @@ def fourBars(number):
     chords.chords.append(chords.chords[-1])
 
 while fourBars(0) == 'no':
-    #print('retry -----------------')
     del s.notes[1:]
     del a.notes[1:]
     del t.notes[1:]
     del b.notes[1:]
     del chords.chords[1:]
 
-number = 0
-while chords.chords[-1][0] == '4':
-    s.notes.append(21)
-    a.notes.append(16)
-    t.notes.append(11)
-    b.notes.append(7)
-    chords.chords.append('00')
-    number += 1
-    count = 0
-    while fourBars(number) == 'no':
-        #print('retry -----------------', number, count)
-        count += 1
-        del s.notes[(16 * number) + 1:]
-        del a.notes[(16 * number) + 1:]
-        del t.notes[(16 * number) + 1:]
-        del b.notes[(16 * number) + 1:]
-        del chords.chords[(16 * number) + 1:]
-        if count > 100:
-            del s.notes[(16 * (number - 1)) + 1:]
-            del a.notes[(16 * (number - 1)) + 1:]
-            del t.notes[(16 * (number - 1)) + 1:]
-            del b.notes[(16 * (number - 1)) + 1:]
-            del chords.chords[(16 * (number - 1)) + 1:]
-            number = number - 1
-    print(number)
-
+#number = 0
+#while chords.chords[-1][0] == '4':
+#    s.notes.append(21)
+#    a.notes.append(16)
+#    t.notes.append(11)
+#    b.notes.append(7)
+#    chords.chords.append('00')
+#    number += 1
+#    count = 0
+#    while fourBars(number) == 'no':
+#        count += 1
+#        del s.notes[(16 * number):]
+#        del a.notes[(16 * number):]
+#        del t.notes[(16 * number):]
+#        del b.notes[(16 * number):]
+#        del chords.chords[(16 * number):]
+#        if count > 100:
+#            del s.notes[(16 * (number - 1)) + 1:]
+#            del a.notes[(16 * (number - 1)) + 1:]
+#            del t.notes[(16 * (number - 1)) + 1:]
+#            del b.notes[(16 * (number - 1)) + 1:]
+#            del chords.chords[(16 * (number - 1)) + 1:]
+#            number = number - 1
+#    print((number + 1)*16)
+#print(len(s.notes))
 
 
 def translator(RANDOMLIST):
