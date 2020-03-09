@@ -90,6 +90,51 @@ def voiceCrossing(voice1, voice2, beat):
     if voice1.notes[beat] < voice2.notes[beat]:
         crossing = "no"
     return(crossing)
+    
+def doubling(beat):
+    doubling = "go"
+    doubledVoices = 0
+    notes = beatNotes[beat]
+    root = notes[0]
+    rootVoices = 0
+    third = notes[1]
+    thirdVoices = 0
+    fifth = notes[2]
+    fifthVoices = 0
+    if b.notes[beat] % 7 == root:
+        rootVoices += 1
+    if b.notes[beat] % 7 == third:
+        thirdVoices += 1
+    if b.notes[beat] % 7 == fifth:
+        fifthVoices += 1
+    if t.notes[beat] % 7 == root:
+        rootVoices += 1
+    if t.notes[beat] % 7 == third:
+        thirdVoices += 1
+    if t.notes[beat] % 7 == fifth:
+        fifthVoices += 1
+    if a.notes[beat] % 7 == root:
+        rootVoices += 1
+    if a.notes[beat] % 7 == third:
+        thirdVoices += 1
+    if a.notes[beat] % 7 == fifth:
+        fifthVoices += 1
+    if s.notes[beat] % 7 == root:
+        rootVoices += 1
+    if s.notes[beat] % 7 == third:
+        thirdVoices += 1
+    if s.notes[beat] % 7 == fifth:
+        fifthVoices += 1
+    if rootVoices > 2 or thirdVoices > 2 or fifthVoices > 2:
+        doubling = "no"
+    if rootVoices >= 2:
+        doubledVoices += 1
+    if thirdVoices >= 2:
+        doubledVoices += 1
+    if fifthVoices >= 2:
+        doubledVoices += 1
+    if doubledVoices >= 2:
+        doubling = "no"
 
 def randChord():
     inversion = str(random.randrange(3))
@@ -149,7 +194,7 @@ def closestNote(voice, beat, notes):
     else:
         for x in notes:
             if abs(voice - x) < abs(voice - closestNote):
-                closestNote = x  
+                closestNote = x
     return(closestNote)
     
 def soprano(beat):
@@ -195,7 +240,7 @@ def alto(beat):
     notes = findMoreNotes(a, beat)
     alto = closestNote(a, beat, notes)
     a.notes.append(alto)
-    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t, beat) == 'no':    
+    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t, beat) == 'no' or doubling == 'no':    
         notes.remove(a.notes[-1])
         del a.notes[-1]
         if len(notes) == 0:
@@ -206,8 +251,8 @@ def alto(beat):
             if notesLeft.find(str(note % 7)) == -1:
                 notesLeft += str(note % 7)
         beatNotes[beat] = notesLeft
-        aNote = closestNote(a, beat, notes)
-        a.notes.append(aNote)
+        alto = closestNote(a, beat, notes)
+        a.notes.append(alto)
 
 
 
@@ -228,6 +273,7 @@ def fourBars(number):
                 chords.chords[beat] = randChord()
                 b.notes[beat] = bass(beat)
             beatNotes[beat] = findNotes(beat)
+            print(beatNotes, voiceError)
             if voiceError == 't':
                 del s.notes[beat]
             elif voiceError == 'a':
@@ -250,31 +296,6 @@ while fourBars(0) == 'no':
     del b.notes[1:]
     del chords.chords[1:]
 
-#number = 0
-#while chords.chords[-1][0] == '4':
-#    s.notes.append(21)
-#    a.notes.append(16)
-#    t.notes.append(11)
-#    b.notes.append(7)
-#    chords.chords.append('00')
-#    number += 1
-#    count = 0
-#    while fourBars(number) == 'no':
-#        count += 1
-#        del s.notes[(16 * number):]
-#        del a.notes[(16 * number):]
-#        del t.notes[(16 * number):]
-#        del b.notes[(16 * number):]
-#        del chords.chords[(16 * number):]
-#        if count > 100:
-#            del s.notes[(16 * (number - 1)) + 1:]
-#            del a.notes[(16 * (number - 1)) + 1:]
-#            del t.notes[(16 * (number - 1)) + 1:]
-#            del b.notes[(16 * (number - 1)) + 1:]
-#            del chords.chords[(16 * (number - 1)) + 1:]
-#            number = number - 1
-#    print((number + 1)*16)
-#print(len(s.notes))
 
 
 def translator(RANDOMLIST):
@@ -297,16 +318,49 @@ def translator(RANDOMLIST):
             degree = 11  # b
         scraped = int(x) - int(x % 7)
         octave = (scraped / 7)
-        newNote = 12 + 12 +12 + (octave * 12) + degree  # c0 plus extra octave plus octave generated plus degree
+        newNote = 12 + 12 + 12 + (octave * 12) + degree  # c0 plus extra octave plus octave generated plus degree
         newNote = int(newNote)
         newList = newList + [newNote]
-    return(newList)
+    return (newList)
 
 
 sList = translator(s.notes)
 aList = translator(a.notes)
 tList = translator(t.notes)
 bList = translator(b.notes)
+
+
+def halfnoteaddition(inputlist):
+    newList = []
+    for note in inputlist:
+        newList = newList + [note]
+    listlength = len(newList)
+    newList.pop(listlength - 1)
+    return (newList)
+
+
+def halfnotepart2(inputlist):
+    return (inputlist.pop())
+
+
+def shortlist(inputlist):
+    length = len(inputlist)
+    inputlist.pop(length - 1)
+    return (inputlist)
+
+
+sList = halfnoteaddition(sList)
+sEnding = [halfnotepart2(sList)]
+#sList = shortlist(sList)
+tList = halfnoteaddition(tList)
+tEnding = [halfnotepart2(tList)]
+#tList = shortlist(tList)
+aList = halfnoteaddition(aList)
+aEnding = [halfnotepart2(aList)]
+#aList = shortlist(aList)
+bList = halfnoteaddition(bList)
+bEnding = [halfnotepart2(bList)]
+#bList = shortlist(bList)
 
 # 21 = C5
 # 16 = E4
@@ -351,6 +405,19 @@ for pitch in tList:
     MyMIDI.addNote(1, channel, pitch, time, duration, volume)
     time = time + 1
     tVerify = "go"
+for pitch in sEnding:
+    MyMIDI.addNote(0, channel, pitch, time, 2, volume)
+for pitch in aEnding:
+    MyMIDI.addNote(0, channel, pitch, time, 2, volume)
+for pitch in tEnding:
+    MyMIDI.addNote(1, channel, pitch, time, 2, volume)
+for pitch in bEnding:
+    MyMIDI.addNote(1, channel, pitch, time, 2, volume)
+
+#for pitch in sEnding:
+
+
+
 
 with open("test1.mid", "wb") as output_file:
     MyMIDI.writeFile(output_file)
