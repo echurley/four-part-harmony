@@ -106,8 +106,10 @@ def doubling(beat):
         doubledVoices += 1
     if t.notes[beat] % 7 == b.notes[beat] % 7:
         doubledVoices += 1
-    if doubledVoices >= 2:
-        doubling = "no"
+    print(doubledVoices, beat)
+    if doubledVoices > 1:
+        doubling = 'no'
+    return(doubling)
 
 def randChord():
     inversion = str(random.randrange(3))
@@ -213,7 +215,7 @@ def alto(beat):
     notes = findMoreNotes(a, beat)
     alto = closestNote(a, beat, notes)
     a.notes.append(alto)
-    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t, beat) == 'no' or doubling == 'no':    
+    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t, beat) == 'no' or doubling(beat) == 'no':    
         notes.remove(a.notes[-1])
         del a.notes[-1]
         if len(notes) == 0:
@@ -246,7 +248,6 @@ def fourBars(number):
                 chords.chords[beat] = randChord()
                 b.notes[beat] = bass(beat)
             beatNotes[beat] = findNotes(beat)
-            print(beatNotes, voiceError)
             if voiceError == 't':
                 del s.notes[beat]
             elif voiceError == 'a':
@@ -297,12 +298,35 @@ def translator(RANDOMLIST):
         newList = newList + [newNote]
     return (newList)
 
+def letternote(list):
+    newlist = []
+    for x in list:
+        noteFinder = x % 7
+        if noteFinder == 0:
+            degree = 'C'  # c
+        elif noteFinder == 1:
+            degree = 'D'  # d
+        elif noteFinder == 2:
+            degree = 'E'  # e
+        elif noteFinder == 3:
+            degree = 'F'  # f
+        elif noteFinder == 4:
+            degree = 'G'  # g
+        elif noteFinder == 5:
+            degree = 'A'  # a
+        else:
+            degree = 'B'  # b
+        newlist = newlist + [degree]
+    print(newlist)
 
 sList = translator(s.notes)
 aList = translator(a.notes)
 tList = translator(t.notes)
 bList = translator(b.notes)
-
+letternote(s.notes)
+letternote(a.notes)
+letternote(t.notes)
+letternote(b.notes)
 
 def halfnoteaddition(inputlist):
     newList = []
