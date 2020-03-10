@@ -106,7 +106,6 @@ def doubling(beat):
         doubledVoices += 1
     if t.notes[beat] % 7 == b.notes[beat] % 7:
         doubledVoices += 1
-    print(doubledVoices, beat)
     if doubledVoices > 1:
         doubling = 'no'
     return(doubling)
