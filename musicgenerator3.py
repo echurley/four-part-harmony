@@ -1,7 +1,12 @@
 from collections import namedtuple
 import random
 import turtle
+import os
+import pygame
+#import midi
+import pygame.midi
 from midiutil import MIDIFile
+from pygame.locals import *
 
 
 
@@ -16,6 +21,12 @@ chords = namedtuple('chords', 'part chords')
 chords = chords('chords', ['00'])
 beatNotes = ['024']
 voiceError = ''
+
+
+
+pygame.init()
+pygame.midi.init()
+
 
     
 def parallelFourths(voice1, voice2, beat):
@@ -272,9 +283,9 @@ while fourBars(0) == 'no':
 
 
 
-def translator(RANDOMLIST):
+def translator(inputList):
     newList = []
-    for x in RANDOMLIST:
+    for x in inputList:
         noteFinder = x % 7
         if noteFinder == 0:
             degree = 0  # c
@@ -290,15 +301,16 @@ def translator(RANDOMLIST):
             degree = 9  # a
         else:
             degree = 11  # b
-        scraped = int(x) - int(x % 7)
-        octave = (scraped / 7)
-        newNote = 12 + 12 + 12 + (octave * 12) + degree  # c0 plus extra octave plus octave generated plus degree
+        degree2 = int(x) - int(x % 7)
+        octave = (degree2 / 7)
+        newNote = 36 + (octave * 12) + degree  # c0 plus extra octave plus octave generated plus degree
         newNote = int(newNote)
         newList = newList + [newNote]
     return (newList)
 
-def letternote(list):
-    newlist = []
+
+def letterNote(list):
+    newList = []
     for x in list:
         noteFinder = x % 7
         if noteFinder == 0:
@@ -315,19 +327,11 @@ def letternote(list):
             degree = 'A'  # a
         else:
             degree = 'B'  # b
-        newlist = newlist + [degree]
-    print(newlist)
+        newList = newList + [degree]
+    print(newList)
 
-sList = translator(s.notes)
-aList = translator(a.notes)
-tList = translator(t.notes)
-bList = translator(b.notes)
-letternote(s.notes)
-letternote(a.notes)
-letternote(t.notes)
-letternote(b.notes)
 
-def halfnoteaddition(inputlist):
+def halfNoteAddition(inputlist):
     newList = []
     for note in inputlist:
         newList = newList + [note]
@@ -336,45 +340,91 @@ def halfnoteaddition(inputlist):
     return (newList)
 
 
-def halfnotepart2(inputlist):
+def findEnding(inputlist):
     return (inputlist.pop())
 
 
-def shortlist(inputlist):
-    length = len(inputlist)
-    inputlist.pop(length - 1)
-    return (inputlist)
+# def writer(list):
+#    if list.Verify == "no":
+#        time = 0
+#    duration = 1
+#    channel = 0
+#    tempo = 100
+#    volume = 100
+#    for pitch in list.notes:
+#        MyMIDI.addNote(1, channel, pitch, time, duration, volume)
+#        time = time + 1
 
 
-sList = halfnoteaddition(sList)
-sEnding = [halfnotepart2(sList)]
-#sList = shortlist(sList)
-tList = halfnoteaddition(tList)
-tEnding = [halfnotepart2(tList)]
-#tList = shortlist(tList)
-aList = halfnoteaddition(aList)
-aEnding = [halfnotepart2(aList)]
-#aList = shortlist(aList)
-bList = halfnoteaddition(bList)
-bEnding = [halfnotepart2(bList)]
-#bList = shortlist(bList)
+def export():
+    filename = input("Write desired filename here!")
+    checker = bool(filename.find(".mid"))
+    if checker != False:
+        filename = (str(filename) + (".mid"))
+#        print(filename)
+    MIDI = str(filename)
+    with open(MIDI, "wb") as output_file:
+        MyMIDI.writeFile(output_file)
+    path = os.path.abspath(MIDI)
+    print(path)
+    os.startfile(path)
 
-# 21 = C5
-# 16 = E4
-# 11 = G3
-# 7 = C3
-# find note, then octave
+def pygameExport():
+    filename = input("Write desired filename here!")
+    checker = bool(filename.find(".mid"))
+    if checker != False:
+        filename = (str(filename) + (".mid"))
+    #        print(filename)
+    MIDI = str(filename)
+    with open(MIDI, "wb") as output_file:
+        MyMIDI.writeFile(output_file)
+    path = os.path.abspath(MIDI)
+    return(MIDI)
 
-bVerify = "no"
-sVerify = "no"
-aVerify = "no"
-tVerify = "no"
+def music(file):
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play()
+    length = pygame.time.get_ticks()
+    while pygame.mixer.music.get_busy():
+        pygame.time.wait(length)
+
+while fourBars(0) == 'no':
+    del s.notes[1:]
+    del a.notes[1:]
+    del t.notes[1:]
+    del b.notes[1:]
+    del chords.chords[1:]
+    print("reset")
+
+sList = translator(s.notes)
+aList = translator(a.notes)
+tList = translator(t.notes)
+bList = translator(b.notes)
+#letterNote(s.notes)
+#letterNote(a.notes)
+#letterNote(t.notes)
+#letterNote(b.notes)
+sList = halfNoteAddition(sList)
+sEnding = [findEnding(sList)]
+tList = halfNoteAddition(tList)
+tEnding = [findEnding(tList)]
+aList = halfNoteAddition(aList)
+aEnding = [findEnding(aList)]
+bList = halfNoteAddition(bList)
+bEnding = [findEnding(bList)]
 
 time = 0
 duration = 1
 channel = 0
 tempo = 100
 volume = 100
+MyMIDI = MIDIFile(2)
+MyMIDI.addTempo(1, time, tempo)
+bVerify = "no"
+sVerify = "no"
+aVerify = "no"
+tVerify = "no"
+
 MyMIDI = MIDIFile(2)
 MyMIDI.addTempo(1, time, tempo)
 
@@ -411,10 +461,8 @@ for pitch in tEnding:
 for pitch in bEnding:
     MyMIDI.addNote(1, channel, pitch, time, 2, volume)
 
-#for pitch in sEnding:
 
-
-
-
-with open("test1.mid", "wb") as output_file:
-    MyMIDI.writeFile(output_file)
+#export()
+#pygameExport()
+a = pygameExport()
+music(a)
