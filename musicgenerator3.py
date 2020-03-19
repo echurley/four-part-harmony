@@ -1,14 +1,7 @@
 from collections import namedtuple
 import random
-import turtle
 import os
-import pygame
-#import midi
-import pygame.midi
 from midiutil import MIDIFile
-from pygame.locals import *
-
-
 
 chordNotes = ["024", "135", "246", "350", "461", "502", "613"]
 cadences = ['AC', 'HC', 'P', 'D']
@@ -23,38 +16,36 @@ beatNotes = ['024']
 voiceError = ''
 
 
-
-pygame.init()
-pygame.midi.init()
-
-
-    
 def parallelFourths(voice1, voice2, beat):
     parallelFourths = "go"
     if voice1.notes[beat] - voice2.notes[beat] == 3:
         if voice1.notes[beat - 1] - voice2.notes[beat - 1] == 3:
             if voice1.notes[beat - 1] != voice1.notes[beat] and voice2.notes[beat - 1] != voice2.notes[beat]:
-                if (voice1.notes[beat - 1] > voice1.notes[beat] and voice2.notes[beat - 1] > voice2.notes[beat]) or (voice1.notes[beat - 1] < voice1.notes[beat] and voice2.notes[beat - 1] < voice2.notes[beat]):
+                if (voice1.notes[beat - 1] > voice1.notes[beat] and voice2.notes[beat - 1] > voice2.notes[beat]) or (
+                        voice1.notes[beat - 1] < voice1.notes[beat] and voice2.notes[beat - 1] < voice2.notes[beat]):
                     parallelFourths = "no"
-    return(parallelFourths)
-    
+    return (parallelFourths)
+
+
 def parallelFifths(voice1, voice2, beat):
     parallelFifths = "go"
     if voice1.notes[beat] - voice2.notes[beat] == 4:
         if voice1.notes[beat - 1] - voice2.notes[beat - 1] == 4:
             if voice1.notes[beat - 1] != voice1.notes[beat] and voice2.notes[beat - 1] != voice2.notes[beat]:
-                if (voice1.notes[beat - 1] > voice1.notes[beat] and voice2.notes[beat - 1] > voice2.notes[beat]) or (voice1.notes[beat - 1] < voice1.notes[beat] and voice2.notes[beat - 1] < voice2.notes[beat]):
+                if (voice1.notes[beat - 1] > voice1.notes[beat] and voice2.notes[beat - 1] > voice2.notes[beat]) or (
+                        voice1.notes[beat - 1] < voice1.notes[beat] and voice2.notes[beat - 1] < voice2.notes[beat]):
                     parallelFifths = "no"
-    return(parallelFifths)
-    
+    return (parallelFifths)
+
+
 def parallelOctaves(voice1, voice2, beat):
     parallelOctaves = "go"
     if voice1.notes[beat] - voice2.notes[beat] == 7:
         if voice1.notes[beat - 1] - voice2.notes[beat - 1] == 7:
-
             parallelOctaves = "no"
-    return(parallelOctaves)
-    
+    return (parallelOctaves)
+
+
 def inRange(voice, beat):
     inRange = "go"
     note = voice.notes[beat]
@@ -70,28 +61,31 @@ def inRange(voice, beat):
     else:
         if note > 16 or note < 2:
             inRange = "no"
-    return(inRange)
-    
-def spacing(voice1, voice2, beat): #voice1 is above voice2 btw
+    return (inRange)
+
+
+def spacing(voice1, voice2, beat):  # voice1 is above voice2 btw
     spacing = "go"
     if voice1.part == 't':
         if (voice1.notes[beat] - voice2.notes[beat]) > 9:
-            spacing = "no"        
+            spacing = "no"
     elif voice1.part == "s" and voice2.part == "b":
         if (voice1.notes[beat] - voice2.notes[beat]) > 23:
             spacing = "no"
     else:
         if abs(voice1.notes[beat] - voice2.notes[beat]) > 7:
             spacing = "no"
-    return(spacing)
-    
+    return (spacing)
+
+
 def twoLeaps(voice, beat):
     leap = "go"
     if abs(voice.notes[beat - 2] - voice.notes[beat - 1]) > 3:
         if abs(voice.notes[beat - 1] - voice.notes[beat]) > 3:
             leap = "no"
-    return(leap)
-    
+    return (leap)
+
+
 def voiceCrossing(voice1, voice2, beat):
     crossing = "go"
     if voice1.notes[beat] < voice2.notes[beat - 1]:
@@ -100,8 +94,9 @@ def voiceCrossing(voice1, voice2, beat):
         crossing = "no"
     if voice1.notes[beat] < voice2.notes[beat]:
         crossing = "no"
-    return(crossing)
-    
+    return (crossing)
+
+
 def doubling(beat):
     doubling = "go"
     doubledVoices = 0
@@ -119,14 +114,16 @@ def doubling(beat):
         doubledVoices += 1
     if doubledVoices > 1:
         doubling = 'no'
-    return(doubling)
+    return (doubling)
+
 
 def randChord():
     inversion = str(random.randrange(3))
     chord = str(random.randrange(7))
     chord = chord + inversion
-    return(chord)
-    
+    return (chord)
+
+
 def cadence():
     aCadence = cadences[random.randrange(3)]
     if aCadence == 'AC':
@@ -137,13 +134,15 @@ def cadence():
         chords.chords.extend(('3' + str(random.randrange(2)), '0' + str(random.randrange(2))))
     else:
         chords.chords.extend(('4' + str(random.randrange(2)), '3' + str(random.randrange(2))))
-    return(aCadence)
+    return (aCadence)
+
 
 def findNotes(beat):
     chord = chords.chords[beat]
     root = int(chord[0])
     notes = chordNotes[root]
-    return(notes)
+    return (notes)
+
 
 def findMoreNotes(voice, beat):
     notes = list(beatNotes[beat])
@@ -153,7 +152,8 @@ def findMoreNotes(voice, beat):
         moreNotes.append(int(x) + octave * 7)
     for x in notes:
         moreNotes.append(int(x) + 7 + octave * 7)
-    return(moreNotes)
+    return (moreNotes)
+
 
 def bass(beat):
     chord = chords.chords[beat]
@@ -167,7 +167,8 @@ def bass(beat):
         bass = root + 4
     if bass < 4:
         bass = bass + 7
-    return(bass)
+    return (bass)
+
 
 def closestNote(voice, beat, notes):
     closestNote = notes[0]
@@ -175,24 +176,27 @@ def closestNote(voice, beat, notes):
     if beat < 8:
         for x in notes:
             if abs(voice - x) <= abs(voice - closestNote):
-                closestNote = x   
+                closestNote = x
     else:
         for x in notes:
             if abs(voice - x) < abs(voice - closestNote):
                 closestNote = x
-    return(closestNote)
-    
+    return (closestNote)
+
+
 def soprano(beat):
     global voiceError
     notes = findMoreNotes(s, beat)
     sNote = closestNote(s, beat, notes)
     s.notes.append(sNote)
-    while parallelFourths(s, b, beat) == "no" or parallelFifths(s, b, beat) == "no" or parallelOctaves(s, b, beat) == "no" or spacing(s, b, beat) == "no" or inRange(s, beat) == "no":
+    while parallelFourths(s, b, beat) == "no" or parallelFifths(s, b, beat) == "no" or parallelOctaves(s, b,
+                                                                                                       beat) == "no" or spacing(
+            s, b, beat) == "no" or inRange(s, beat) == "no":
         notes.remove(s.notes[-1])
         del s.notes[-1]
         if len(notes) == 0:
             voiceError = 's'
-            return('no')
+            return ('no')
         notesLeft = ''
         for note in notes:
             if notesLeft.find(str(note % 7)) == -1:
@@ -201,17 +205,21 @@ def soprano(beat):
         sNote = closestNote(s, beat, notes)
         s.notes.append(sNote)
 
+
 def tenor(beat):
     global voiceError
     notes = findMoreNotes(t, beat)
     tNote = closestNote(t, beat, notes)
     t.notes.append(tNote)
-    while parallelFifths(t, b, beat) == "no" or parallelFifths(s, t, beat) == "no" or parallelOctaves(t, b, beat) == "no" or parallelOctaves(s, t, beat) == "no" or spacing(t, b, beat) == "no" or inRange(t, beat) == "no" or voiceCrossing(t, b, beat) == 'no':
+    while parallelFifths(t, b, beat) == "no" or parallelFifths(s, t, beat) == "no" or parallelOctaves(t, b,
+                                                                                                      beat) == "no" or parallelOctaves(
+            s, t, beat) == "no" or spacing(t, b, beat) == "no" or inRange(t, beat) == "no" or voiceCrossing(t, b,
+                                                                                                            beat) == 'no':
         notes.remove(t.notes[-1])
         del t.notes[-1]
         if len(notes) == 0:
             voiceError = 't'
-            return('no')
+            return ('no')
         notesLeft = ''
         for note in notes:
             if notesLeft.find(str(note % 7)) == -1:
@@ -219,18 +227,26 @@ def tenor(beat):
         beatNotes[beat] = notesLeft
         tNote = closestNote(t, beat, notes)
         t.notes.append(tNote)
-        
+
+
 def alto(beat):
     global voiceError
     notes = findMoreNotes(a, beat)
     alto = closestNote(a, beat, notes)
     a.notes.append(alto)
-    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a, beat) == "no" or parallelOctaves(a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a, beat) == "no" or spacing(a, t, beat) == "no" or spacing(s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t, beat) == 'no' or doubling(beat) == 'no':    
+    while parallelFifths(a, b, beat) == "no" or parallelFifths(a, t, beat) == "no" or parallelFifths(s, a,
+                                                                                                     beat) == "no" or parallelOctaves(
+            a, b, beat) == "no" or parallelOctaves(a, t, beat) == "no" or parallelOctaves(s, a,
+                                                                                          beat) == "no" or spacing(a, t,
+                                                                                                                   beat) == "no" or spacing(
+            s, a, beat) == "no" or inRange(a, beat) == "no" or voiceCrossing(s, a, beat) == 'no' or voiceCrossing(a, t,
+                                                                                                                  beat) == 'no' or doubling(
+            beat) == 'no':
         notes.remove(a.notes[-1])
         del a.notes[-1]
         if len(notes) == 0:
             voiceError = 'a'
-            return('no')
+            return ('no')
         notesLeft = ''
         for note in notes:
             if notesLeft.find(str(note % 7)) == -1:
@@ -240,14 +256,13 @@ def alto(beat):
         a.notes.append(alto)
 
 
-
-def fourBars(number):
+def fourBars():
     global voiceError
-    for beat in range(number + 1, (number + 1) * 16 - 3):
+    for beat in range(1, 13):
         chords.chords.append(randChord())
     cadence()
-    
-    for beat in range(number + 1, (number + 1) * 16 - 1):
+
+    for beat in range(1, 15):
         counter = 0
         beatNotes.append(findNotes(beat))
         b.notes.append(bass(beat))
@@ -266,22 +281,22 @@ def fourBars(number):
             if counter > 100:
                 break
         if counter >= 100:
-            return('no')
+            return ('no')
     s.notes.append(s.notes[-1])
     a.notes.append(a.notes[-1])
     t.notes.append(t.notes[-1])
     b.notes.append(b.notes[-1])
     chords.chords.append(chords.chords[-1])
+    return('yes')
 
-while fourBars(0) == 'no':
+
+while fourBars() == 'no':
     del beatNotes[1:]
     del s.notes[1:]
     del a.notes[1:]
     del t.notes[1:]
     del b.notes[1:]
     del chords.chords[1:]
-
-
 
 def translator(inputList):
     newList = []
@@ -339,71 +354,35 @@ def halfNoteAddition(inputlist):
     newList.pop(listlength - 1)
     return (newList)
 
-
 def findEnding(inputlist):
     return (inputlist.pop())
-
-
-# def writer(list):
-#    if list.Verify == "no":
-#        time = 0
-#    duration = 1
-#    channel = 0
-#    tempo = 100
-#    volume = 100
-#    for pitch in list.notes:
-#        MyMIDI.addNote(1, channel, pitch, time, duration, volume)
-#        time = time + 1
-
 
 def export():
     filename = input("Write desired filename here!")
     checker = bool(filename.find(".mid"))
-    if checker != False:
+    if checker == False:
         filename = (str(filename) + (".mid"))
-#        print(filename)
+        print(filename)
     MIDI = str(filename)
+    checker = MIDI.find('.mid')
+    if checker != False:
+        MIDI = (MIDI + ".mid")
     with open(MIDI, "wb") as output_file:
         MyMIDI.writeFile(output_file)
     path = os.path.abspath(MIDI)
     print(path)
     os.startfile(path)
 
-def pygameExport():
-    filename = input("Write desired filename here!")
-    checker = bool(filename.find(".mid"))
-    if checker != False:
-        filename = (str(filename) + (".mid"))
-    #        print(filename)
-    MIDI = str(filename)
-    with open(MIDI, "wb") as output_file:
-        MyMIDI.writeFile(output_file)
-    path = os.path.abspath(MIDI)
-    return(MIDI)
 
-def music(file):
-    pygame.mixer.music.load(file)
-    pygame.mixer.music.play()
-    length = pygame.time.get_ticks()
-    while pygame.mixer.music.get_busy():
-        pygame.time.wait(length)
-
-while fourBars(0) == 'no':
-    del s.notes[1:]
-    del a.notes[1:]
-    del t.notes[1:]
-    del b.notes[1:]
-    del chords.chords[1:]
-    print("reset")
 
 sList = translator(s.notes)
 aList = translator(a.notes)
 tList = translator(t.notes)
 bList = translator(b.notes)
-#letterNote(s.notes)
-#letterNote(a.notes)
-#letterNote(t.notes)
-#letterNote(b.notes)
+letterNote(s.notes)
+letterNote(a.notes)
+letterNote(t.notes)
+letterNote(b.notes)
 sList = halfNoteAddition(sList)
 sEnding = [findEnding(sList)]
 tList = halfNoteAddition(tList)
@@ -461,8 +440,4 @@ for pitch in tEnding:
 for pitch in bEnding:
     MyMIDI.addNote(1, channel, pitch, time, 2, volume)
 
-
-#export()
-#pygameExport()
-a = pygameExport()
-music(a)
+export()
